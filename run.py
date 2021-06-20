@@ -21,6 +21,13 @@ class PostArticle(db.Model):
     post_content = db.Column(db.String(128), nullable=False)
 
 
+class UserInformation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    user_name = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(128), nullbale=False)
+
 @app.route('/', methods=['GET', 'POST'])  # index関数を実行している
 def start_exe():
     return render_template('index.html')
