@@ -1,3 +1,5 @@
+import hashlib
+
 import flask
 from flask import Flask, Response, abort, render_template, url_for, flash, redirect, request
 from flask_sqlalchemy import SQLAlchemy
@@ -39,9 +41,10 @@ def start_exe():
     return render_template('index.html')
 
 
-users = UserInformation.query.filter(UserInformation.user_name == 'shosho').all()
+users = UserInformation.query.all()
 for user in users:
-    print(user.user_name)
+    print('\n\n')
+    print(user.password)
 
 """
 app.secret_key = 'secret key'
@@ -117,7 +120,7 @@ def signup_confirm():
     user_id = request.form['user_id']
     user_name = request.form['user_name']
     email_address = request.form['email_address']
-    password = request.form['password']
+    password = hashlib.sha256(request.form['password'].encode('utf-8')).hexdigest()
     
     user_information = UserInformation(user_id=user_id, password=password, user_name=user_name, email_address=email_address)
     db.session.add(user_information)
