@@ -3,11 +3,12 @@ import hashlib
 import flask
 from flask import Flask, Response, abort, render_template, url_for, flash, redirect, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
+from flask_login import current_user, login_user, logout_user, login_required, UserMixin
 from collections import defaultdict
 from flask_login import login_user
 import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = flask.Flask(__name__)
 
@@ -28,7 +29,7 @@ class PostArticle(db.Model):
     post_content = db.Column(db.String(128), nullable=False)
 
 
-class UserInformation(db.Model):
+class UserInformation(UserMixin, db.Model):
     
     __tablename__ = 'users'
     
@@ -39,46 +40,45 @@ class UserInformation(db.Model):
     email_address = db.Column(db.String(128), nullable=False)
 
 
-@app.route('/', methods=['GET', 'POST'])  # index関数を実行している
-def start_exe():
-    return render_template('index.html')
-
-
-"""
-app.secret_key = 'secret key'
+app.secret_key = 'secret key'  # セッションを有効にするために必要
+app.config['SECRET_KEY'] = 'secret'
 
 login_manager = flask_login.LoginManager()
-
-
-# login
-login_manager = LoginManager()
+login_manager.login_view = 'signin'  # 参考URL:https://teratail.com/questions/167338
 login_manager.init_app(app)
-app.config['SECRET_KEY'] = 'secret'
 
 
 # ログインが必要なページに行くたびに実行される.セッションからユーザーをリロードする。
 # 認証ユーザの呼び出し方を定義しているらしい
 @login_manager.user_loader
 def load_user(user_id):
-    if user_id not in users:
-        return
-    
-    user = User()
-    user.user_id = user_id
-    return user
+    return UserInformation.query.get(user_id)
 
 
-# flaskのrequestからユーザをロードする.多分一番初めのログイン時に必要なんやと思う
-@login_manager.request_loader
-def request_loader(request):
-    user_id = request.form.get('user_id')
-    if user_id not in users:
-        return
+@app.route('/', methods=['GET', 'POST'])  # index関数を実行している
+def start_exe():
+    return render_template('index.html')
+
+
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+    return render_template('signin.html')
+
+
+@app.route('/signin_confirm', methods=['GET', 'POST'])
+def signin_confirm():
+    user_id = request.form['user_id']
+    password = request.form['password']
     
-    user = User()
-    user.user_id = user_id
-    return user
-"""
+    users = UserInformation
+    is_user = users.query.filter_by(user_id=user_id).first()
+    
+    if is_user is None or not check_password_hash(is_user.password, password):
+        return redirect(url_for('signin'))
+    else:
+        user = is_user
+        login_user(user)
+        return redirect(url_for('start_exe'))
 
 
 @app.route('/signup', methods=['GET', 'POST'])
