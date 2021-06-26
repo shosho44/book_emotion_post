@@ -130,6 +130,13 @@ def signup_confirm():
     return redirect(url_for('post_article_redirect'))
 
 
+@app.route('/logout_yes', methods=['POST'])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('signin'))
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
     db.create_all()

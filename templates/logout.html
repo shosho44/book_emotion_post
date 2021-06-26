@@ -9,11 +9,12 @@
 <body>
     <div>
         <h1>ログアウトしますか？</h1>
-        <div>
-            <a href="#">はい</a>
-            <a href="#">いいえ</a>
-        </div>
-        
+        <form action="logout_yes" method="POST" enctype="multipart/form-data">
+            <button type="submit">はい</button>
+        </form>
+        <form action="logout_no" method="POST" enctype="multipart/form-data">
+            <button type="submit">いいえ</button>
+        </form>
     </div>
 
 </body>
