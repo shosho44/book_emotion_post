@@ -57,7 +57,8 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])  # index関数を実行している
 def start_exe():
-    return render_template('index.html')
+    some_data = PostArticle.query.all()
+    return render_template('index.html', some_data=some_data)
 
 
 @app.route('/signin', methods=['GET', 'POST'])
@@ -130,9 +131,26 @@ def signup_confirm():
     return redirect(url_for('post_article_redirect'))
 
 
+@app.route('/user_profile', methods=['POST', 'GET'])
+def user_profile():
+    return render_template('user-profile.html')
+
+
+@app.route('/logout_confirm', methods=['POST'])
+@login_required
+def logout_confirm():
+    return render_template('logout-confirm.html')
+
+
+@app.route('/logout_no', methods=['POST'])
+@login_required
+def logout_no():
+    return redirect(url_for('user_profile'))
+
+
 @app.route('/logout_yes', methods=['POST'])
 @login_required
-def logout():
+def logout_yes():
     logout_user()
     return redirect(url_for('signin'))
 
