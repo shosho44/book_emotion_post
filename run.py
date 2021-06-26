@@ -7,6 +7,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, U
 from collections import defaultdict
 from flask_login import login_user
 import flask_login
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = flask.Flask(__name__)
 
@@ -22,6 +23,8 @@ class PostArticle(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(128), nullable=False)
+    user_name = db.Column(db.String(128), nullable=False)
+    book_title = db.Column(db.String(128), nullable=True)
     post_content = db.Column(db.String(128), nullable=False)
 
 
@@ -41,25 +44,10 @@ def start_exe():
     return render_template('index.html')
 
 
-users = UserInformation.query.all()
-for user in users:
-    print('\n\n')
-    print(user.password)
-
 """
 app.secret_key = 'secret key'
 
 login_manager = flask_login.LoginManager()
-
-
-# ログインする際に必要なユーザの情報
-class User(flask_login.UserMixin):
-    def __init__(self, user_id, user_password):
-        self.user_id = user_id
-        self.user_password = user_password
-    
-    def get_id(self):
-        return self.user_id
 
 
 # login
@@ -98,7 +86,7 @@ def signup():
     return render_template('signup.html')
 
 
-@app.route('/article_redirect', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def post_article_redirect():
     some_data = PostArticle.query.all()
     return render_template('index.html', some_data=some_data)
@@ -108,8 +96,20 @@ def post_article_redirect():
 @app.route('/post_article', methods=['POST'])
 def post_article():
     post_content = request.form['post-article']
+    book_title = request.form['book-title']
+    
     tmp_user_id = '1'
-    some_data = PostArticle(user_id=tmp_user_id, post_content=post_content)
+    
+    users = UserInformation
+    
+    is_post_user_name = users.query.filter_by(user_id=tmp_user_id).first()
+    if is_post_user_name is None:
+        user_name = 'unknown_user'
+    else:
+        user_name = is_post_user_name.user_name
+    
+    some_data = PostArticle(user_id=tmp_user_id, user_name=user_name, book_title=book_title, post_content=post_content)
+    
     db.session.add(some_data)
     db.session.commit()
     return redirect(url_for('post_article_redirect'))  # 関数名を書く
@@ -120,9 +120,13 @@ def signup_confirm():
     user_id = request.form['user_id']
     user_name = request.form['user_name']
     email_address = request.form['email_address']
-    password = hashlib.sha256(request.form['password'].encode('utf-8')).hexdigest()
+    password = request.form['password']
     
-    user_information = UserInformation(user_id=user_id, password=password, user_name=user_name, email_address=email_address)
+    is_user_exist = UserInformation.query.filter_by(email_address=email_address).first()
+    if is_user_exist:
+        return redirect(url_for('signup'))  # リダイレクト先変更する
+    
+    user_information = UserInformation(user_id=user_id, password=generate_password_hash(password, method='sha256'), user_name=user_name, email_address=email_address)
     db.session.add(user_information)
     db.session.commit()
     return redirect(url_for('post_article_redirect'))

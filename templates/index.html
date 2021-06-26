@@ -12,13 +12,20 @@
     </div>
     <div>
         <form action="/post_article" method="POST">
+            <span>本文</span>
             <input type="text" name="post-article"/>
+            <span>本のタイトル</span>
+            <input type="text" name="book-title">
             <input type="submit" value="投稿する"/>
         </form>
     </div>
     <div>
         {% for data in some_data %}
-            <p>{{ data.post_content }}</p>
+            <div style="margin-bottom: 5px;background-color:cornsilk">
+                <p>投稿内容: {{ data.post_content }}</p>
+                <span>user name: {{ data.user_name }}</span><br>
+                <span>book title: {{ data.book_title }}</span>
+            </div>
         {% endfor %}
     </div>
 </body>
