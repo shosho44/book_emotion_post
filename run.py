@@ -128,6 +128,9 @@ def signup_confirm():
     user_information = UserInformation(user_id=user_id, password=generate_password_hash(password, method='sha256'), user_name=user_name, email_address=email_address)
     db.session.add(user_information)
     db.session.commit()
+    
+    user = user_information
+    login_user(user)
     return redirect(url_for('post_article_redirect'))
 
 
