@@ -98,17 +98,15 @@ def post_article():
     post_content = request.form['post-article']
     book_title = request.form['book-title']
     
-    tmp_user_id = '1'
+    user_id = current_user.user_id
     
-    users = UserInformation
-    
-    is_post_user_name = users.query.filter_by(user_id=tmp_user_id).first()
+    is_post_user_name = UserInformation.query.filter_by(user_id=user_id).first()
     if is_post_user_name is None:
         user_name = 'unknown_user'
     else:
         user_name = is_post_user_name.user_name
     
-    some_data = PostArticle(user_id=tmp_user_id, user_name=user_name, book_title=book_title, post_content=post_content)
+    some_data = PostArticle(user_id=user_id, user_name=user_name, book_title=book_title, post_content=post_content)
     
     db.session.add(some_data)
     db.session.commit()
