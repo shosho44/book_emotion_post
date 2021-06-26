@@ -133,7 +133,16 @@ def signup_confirm():
 
 @app.route('/user_profile', methods=['POST', 'GET'])
 def user_profile():
-    return render_template('user-profile.html')
+    user_id = current_user.user_id
+    user_name = current_user.user_name
+    
+    is_article_exist = PostArticle.query.filter_by(user_id=user_id).all()
+    
+    if is_article_exist:
+        some_article_data = is_article_exist
+        return render_template('user-profile.html', user_id=user_id, user_name=user_name, some_article_data=some_article_data)
+    else:
+        return render_template('user-profile.html', user_id=user_id, user_name=user_name)
 
 
 @app.route('/logout_confirm', methods=['POST'])

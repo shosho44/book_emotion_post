@@ -12,10 +12,10 @@
     </div>
     <div>
         <div>
-            <span>{{ user_name }}</span>
+            <span>user_name: {{ user_name }}</span>
         </div>
         <div>
-            <span>{{ user_id }}</span>
+            <span>user_id: {{ user_id }}</span>
         </div>
     </div>
     <div>
@@ -25,9 +25,13 @@
         <button type="submit">ログアウトする</button>
     </form>
     <div>
-        <div>
-            <p></p>  <!--ユーザーの投稿一覧表示する。forで回す-->
-        </div>
+        {% for data in some_article_data %}
+            <div style="margin-bottom: 5px;background-color:cornsilk">
+                <p>投稿内容: {{ data.post_content }}</p>
+                <span>user name: {{ data.user_name }}</span><br>
+                <span>book title: {{ data.book_title }}</span>
+            </div>
+        {% endfor %}
     </div>
 </body>
 </html>
