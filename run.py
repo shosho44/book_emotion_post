@@ -1,3 +1,4 @@
+# coding: UTF-8
 import hashlib
 
 import flask
@@ -13,7 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = flask.Flask(__name__)
 
 # データベースの設定
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.test'  # sqliteを使っている
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db'  # sqliteを使っている
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -38,6 +39,7 @@ class UserInformation(UserMixin, db.Model):
     password = db.Column(db.String(128), nullable=False)
     user_name = db.Column(db.String(128), nullable=False)
     email_address = db.Column(db.String(128), nullable=False)
+    self_introduction = db.Column(db.String(128), nullable=False, default='')
 
 
 app.secret_key = 'secret key'  # セッションを有効にするために必要
@@ -146,6 +148,31 @@ def user_profile():
         return render_template('user-profile.html', user_id=user_id, user_name=user_name, some_article_data=some_article_data)
     else:
         return render_template('user-profile.html', user_id=user_id, user_name=user_name)
+
+
+@app.route('/edit_user_profile', methods=['POST', 'GET'])
+def edit_user_profile():
+    user_id = current_user.user_id
+    user_name = current_user.user_name
+    self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
+    
+    return render_template('edit-user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction)
+
+
+@app.route('/update_user_profile', methods=['POST', 'GET'])
+@login_required
+def update_user_profile():
+    user_id = current_user.user_id
+    user_name = request.form['user_name']
+    self_introduction = request.form['self_introduction']
+    
+    user = db.session.query(UserInformation).filter(UserInformation.user_id == user_id).first()
+    user.user_name = user_name
+    user.self_introduction = self_introduction
+    
+    db.session.commit()
+    
+    return redirect(url_for('start_exe'))
 
 
 @app.route('/logout_confirm', methods=['POST'])

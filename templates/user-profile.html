@@ -19,7 +19,9 @@
         </div>
     </div>
     <div>
-        <a href="#">プロフィールを編集する</a>
+        <form action="edit_user_profile" method="POST" enctype="multipart/form-data">
+            <button type="submit">プロフィールを編集する</button>
+        </form>
     </div>
     <form action="logout_confirm" method="POST" enctype="multipart/form-data">
         <button type="submit">ログアウトする</button>

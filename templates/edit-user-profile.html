@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー画面</title>
+</head>
+<body>
+    <div>
+        <img src="../img/sample_image.jpg" width="150px" height="150px">  <!-- 変更する必要がある。一時的に幅高さ写真指定している。-->
+    </div>
+    <div>
+        <form action="update_user_profile" method="POST" enctype="multipart/form-data">
+            <div>
+                <span>現在のuser_name: </span>
+                <input type="text" name="user_name" value="{{ user_name }}">
+            </div>
+            <div>
+                <span>現在の自己紹介文</span>
+                <textarea name="self_introduction">{{ self_introduction }}</textarea>
+            </div>
+            <input type="submit" value="送信する">
+        </form>
+        
+    </div>
+</body>
+</html>
