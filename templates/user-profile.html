@@ -23,24 +23,33 @@
         </div>
     </div>
     <div>
-        <form action="edit_user_profile" method="POST" enctype="multipart/form-data">
-            <button type="submit">プロフィールを編集する</button>
-        </form>
+        {% if is_current_user_equal_article_user == True %}
+            <div>
+                <form action="edit_user_profile" method="POST" enctype="multipart/form-data">
+                    <button type="submit">プロフィールを編集する</button>
+                </form>
+            </div>
+            <div>
+                <form action="logout_confirm" method="POST" enctype="multipart/form-data">
+                    <button type="submit">ログアウトする</button>
+                </form>
+            </div>
+        {% endif %}
     </div>
-    <form action="logout_confirm" method="POST" enctype="multipart/form-data">
-        <button type="submit">ログアウトする</button>
-    </form>
     <div>
         {% for data in some_article_data %}
             <div style="margin-bottom: 5px;background-color:cornsilk">
                 <p>投稿内容: {{ data.post_content }}</p>
                 <span>user name: {{ data.user_name }}</span><br>
-                <span>book title: {{ data.book_title }}</span>
-                <span>いいね数: {{ data.good_button_sum }}</span>
-                <form action="/delete_article_from_user_profile" method="POST">
-                    <input type="hidden" name="article_id" value="{{ data.id }}">
-                    <button type="submit">削除する</button>
-                </form>
+                <span>user id: {{ data.user_id }}</span><br>
+                <span>book title: {{ data.book_title }}</span><br>
+                <span>いいね数: {{ data.good_button_sum }}</span><br>
+                {% if is_current_user_equal_article_user == True %}
+                    <form action="/delete_article_from_user_profile" method="POST">
+                        <input type="hidden" name="article_id" value="{{ data.id }}">
+                        <button type="submit">削除する</button>
+                    </form>
+                {% endif %}
             </div>
         {% endfor %}
     </div>

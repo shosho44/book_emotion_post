@@ -1,5 +1,6 @@
 # coding: UTF-8
 import hashlib
+from logging import exception
 
 import flask
 from flask import Flask, Response, abort, render_template, url_for, flash, redirect, request
@@ -170,7 +171,15 @@ def signup_confirm():
 @app.route('/user_profile', methods=['POST', 'GET'])
 def user_profile():
     user_id = current_user.user_id
-    user_name = current_user.user_name
+    if 'user_id' in request.form:
+        user_id = request.form['user_id']
+    
+    user_name = UserInformation.query.filter_by(user_id=user_id).first().user_name
+    
+    if current_user.user_id == user_id:
+        is_current_user_equal_article_user = True
+    else:
+        is_current_user_equal_article_user = False
     
     self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
     
@@ -178,9 +187,9 @@ def user_profile():
     
     if is_article_exist:
         some_article_data = is_article_exist
-        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction, some_article_data=some_article_data)
+        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction, is_current_user_equal_article_user=is_current_user_equal_article_user, some_article_data=some_article_data)
     else:
-        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction)
+        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction, is_current_user_equal_article_user=is_current_user_equal_article_user)
 
 
 @app.route('/edit_user_profile', methods=['POST', 'GET'])
