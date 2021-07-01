@@ -42,6 +42,15 @@ class UserInformation(UserMixin, db.Model):
     self_introduction = db.Column(db.String(128), nullable=False, default='')
 
 
+class GoodArticle(db.Model):
+    
+    __tablename__ = 'good_sum_of_article'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    article_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.String(128), nullable=False)
+
+
 app.secret_key = 'secret key'  # セッションを有効にするために必要
 app.config['SECRET_KEY'] = 'secret'
 
@@ -141,13 +150,15 @@ def user_profile():
     user_id = current_user.user_id
     user_name = current_user.user_name
     
+    self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
+    
     is_article_exist = PostArticle.query.filter_by(user_id=user_id).all()
     
     if is_article_exist:
         some_article_data = is_article_exist
-        return render_template('user-profile.html', user_id=user_id, user_name=user_name, some_article_data=some_article_data)
+        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction, some_article_data=some_article_data)
     else:
-        return render_template('user-profile.html', user_id=user_id, user_name=user_name)
+        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction)
 
 
 @app.route('/edit_user_profile', methods=['POST', 'GET'])
