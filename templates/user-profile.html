@@ -37,7 +37,7 @@
                 <span>user name: {{ data.user_name }}</span><br>
                 <span>book title: {{ data.book_title }}</span>
                 <span>いいね数: {{ data.good_button_sum }}</span>
-                <form action="/user_profile_delete_article" method="POST">
+                <form action="/delete_article_from_user_profile" method="POST">
                     <input type="hidden" name="article_id" value="{{ data.id }}">
                     <button type="submit">削除する</button>
                 </form>

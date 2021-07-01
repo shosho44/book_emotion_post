@@ -125,15 +125,26 @@ def post_article():
     return redirect(url_for('post_article_redirect'))  # 関数名を書く
 
 
-@app.route('/user_profile_delete_article', methods=['GET', 'POST'])
-def delete_article():
+@app.route('/delete_article_from_user_profile', methods=['GET', 'POST'])
+def delete_article_from_user_profile():
     article_id = request.form['article_id']
     
     delete_article_data = db.session.query(PostArticle).filter_by(id=article_id).first()
     db.session.delete(delete_article_data)
     db.session.commit()
     
-    return redirect(url_for('user_profile'))
+    return redirect(url_for('start_exe'))
+
+
+@app.route('/delete_article_from_home', methods=['GET', 'POST'])
+def delete_article_from_home():
+    article_id = request.form['article_id']
+    
+    delete_article_data = db.session.query(PostArticle).filter_by(id=article_id).first()
+    db.session.delete(delete_article_data)
+    db.session.commit()
+    
+    return redirect(url_for('start_exe'))
 
 
 @app.route('/signup_confirm', methods=['POST'])
