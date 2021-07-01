@@ -28,6 +28,10 @@
                 <p>投稿内容: {{ data.post_content }}</p>
                 <span>user name: {{ data.user_name }}</span><br>
                 <span>book title: {{ data.book_title }}</span>
+                <span>いいね数: {{ data.good_button_sum }}</span>
+                <form action="/delete-article" method="POST">
+                    <button>削除する</button>
+                </form>
             </div>
         {% endfor %}
     </div>
