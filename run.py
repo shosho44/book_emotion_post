@@ -125,6 +125,17 @@ def post_article():
     return redirect(url_for('post_article_redirect'))  # 関数名を書く
 
 
+@app.route('/user_profile_delete_article', methods=['GET', 'POST'])
+def delete_article():
+    article_id = request.form['article_id']
+    
+    delete_article_data = db.session.query(PostArticle).filter_by(id=article_id).first()
+    db.session.delete(delete_article_data)
+    db.session.commit()
+    
+    return redirect(url_for('user_profile'))
+
+
 @app.route('/signup_confirm', methods=['POST'])
 def signup_confirm():
     user_id = request.form['user_id']
