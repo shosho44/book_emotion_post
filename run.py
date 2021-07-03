@@ -1,4 +1,5 @@
 # coding: UTF-8
+import base64
 import hashlib
 from logging import exception
 
@@ -11,13 +12,19 @@ from flask_login import login_user
 import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, static_folder='img')
 
 # データベースの設定
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db'  # sqliteを使っている
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+with open('img/sample_image_human.png', mode='rb') as f:
+    print('\n\n')
+    print('raw\n')
+    print(f.read())
+    print('\n\n')
+    default_user_image_base64 = base64.b64encode(f.read())
 
 
 class PostArticle(db.Model):
@@ -41,6 +48,7 @@ class UserInformation(UserMixin, db.Model):
     user_name = db.Column(db.String(128), nullable=False)
     email_address = db.Column(db.String(128), nullable=False)
     self_introduction = db.Column(db.String(128), nullable=False, default='')
+    user_image = db.Column(db.LargeBinary, nullable=False, default=default_user_image_base64)
 
 
 class GoodArticle(db.Model):
@@ -174,22 +182,26 @@ def user_profile():
     if 'user_id' in request.form:
         user_id = request.form['user_id']
     
-    user_name = UserInformation.query.filter_by(user_id=user_id).first().user_name
+    user = UserInformation.query.filter_by(user_id=user_id).first()
+    user_name = user.user_name
+    self_introduction = user.self_introduction
+    user_image = user.user_image.decode()
     
     if current_user.user_id == user_id:
         is_current_user_equal_article_user = True
     else:
         is_current_user_equal_article_user = False
     
-    self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
-    
     is_article_exist = PostArticle.query.filter_by(user_id=user_id).all()
     
     if is_article_exist:
         some_article_data = is_article_exist
-        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction, is_current_user_equal_article_user=is_current_user_equal_article_user, some_article_data=some_article_data)
+        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction,
+                               user_image=user_image, is_current_user_equal_article_user=is_current_user_equal_article_user,
+                               some_article_data=some_article_data)
     else:
-        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction, is_current_user_equal_article_user=is_current_user_equal_article_user)
+        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction,
+                               user_image=user_image, is_current_user_equal_article_user=is_current_user_equal_article_user)
 
 
 @app.route('/edit_user_profile', methods=['POST', 'GET'])
@@ -197,8 +209,9 @@ def edit_user_profile():
     user_id = current_user.user_id
     user_name = current_user.user_name
     self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
+    user_image = UserInformation.query.filter_by(user_id=user_id).first().user_image.decode()
     
-    return render_template('edit-user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction)
+    return render_template('edit-user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction, user_image=user_image)
 
 
 @app.route('/update_user_profile', methods=['POST', 'GET'])
@@ -207,14 +220,16 @@ def update_user_profile():
     user_id = current_user.user_id
     user_name = request.form['user_name']
     self_introduction = request.form['self_introduction']
+    # user_image = request.files['user_image']
     
     user = db.session.query(UserInformation).filter(UserInformation.user_id == user_id).first()
     user.user_name = user_name
     user.self_introduction = self_introduction
+    # user.user_image = user_image
     
     db.session.commit()
     
-    return redirect(url_for('start_exe'))
+    return redirect(url_for('user_profile'))
 
 
 @app.route('/logout_confirm', methods=['POST'])
