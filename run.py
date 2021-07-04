@@ -20,10 +20,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 with open('img/sample_image_human.png', mode='rb') as f:
-    print('\n\n')
-    print('raw\n')
-    print(f.read())
-    print('\n\n')
     default_user_image_base64 = base64.b64encode(f.read())
 
 
@@ -230,6 +226,28 @@ def update_user_profile():
     db.session.commit()
     
     return redirect(url_for('user_profile'))
+
+
+@app.route('/upload_user_image', methods=['GET', 'POST'])
+@login_required
+def upload_user_image():
+    if 'user_image' not in request.files:
+        return redirect(url_for('edit_user_profile'))
+    
+    user_image = request.files['user_image'].stream.read()
+    user_image_base64 = base64.b64encode(user_image)
+    
+    user = db.session.query(UserInformation).filter(UserInformation.user_id == current_user.user_id).first()
+    user.user_image = user_image_base64
+    
+    db.session.commit()  # 変更するかも。今の段階ではデータベースに登録する必要なしかも
+    
+    return redirect(url_for('edit_user_profile'))
+
+
+@app.route('/show_upload_user_image', methods=['GET', 'POST'])
+def show_upload_user_image():
+    return render_template('upload-user-image.html')
 
 
 @app.route('/logout_confirm', methods=['POST'])
