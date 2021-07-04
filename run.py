@@ -216,12 +216,10 @@ def update_user_profile():
     user_id = current_user.user_id
     user_name = request.form['user_name']
     self_introduction = request.form['self_introduction']
-    # user_image = request.files['user_image']
     
     user = db.session.query(UserInformation).filter(UserInformation.user_id == user_id).first()
     user.user_name = user_name
     user.self_introduction = self_introduction
-    # user.user_image = user_image
     
     db.session.commit()
     
