@@ -268,20 +268,6 @@ def show_upload_user_image():
     return render_template('upload-user-image.html')
 
 
-@app.route('/submit_reply', methods=['POST'])
-def submit_reply():
-    reply_content = request.form['reply_content']
-    article_id = request.form['article_id']
-    
-    reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
-    
-    reply_information = ReplyInformation(article_id=article_id, reply_user_id=current_user.user_id, reply_user_name=reply_user_name, reply_content=reply_content)
-    
-    db.session.add(reply_information)
-    db.session.commit()
-    return reply_thread(article_id)  # 関数名を書く
-
-
 @app.route('/logout_confirm', methods=['POST'])
 @login_required
 def logout_confirm():
@@ -301,6 +287,20 @@ def logout_yes():
     return redirect(url_for('signin'))
 
 
+@app.route('/submit_reply', methods=['POST'])
+def submit_reply():
+    reply_content = request.form['reply_content']
+    article_id = request.form['article_id']
+    
+    reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
+    
+    reply_information = ReplyInformation(article_id=article_id, reply_user_id=current_user.user_id, reply_user_name=reply_user_name, reply_content=reply_content, created_at=time.time())
+    
+    db.session.add(reply_information)
+    db.session.commit()
+    return reply_thread(article_id)
+
+
 @app.route('/reply_thread', methods=['GET', 'POST'])
 def reply_thread(article_id=''):
     if 'article_id' in request.form:
@@ -308,7 +308,7 @@ def reply_thread(article_id=''):
     
     article_data = PostArticle.query.filter_by(id=article_id).first()
     
-    some_reply_data = ReplyInformation.query.filter_by(article_id=article_id).all()
+    some_reply_data = ReplyInformation.query.filter_by(article_id=article_id).order_by(ReplyInformation.created_at.desc()).all()
     
     if article_data:
         return render_template('reply_thread.html', article_data=article_data, some_reply_data=some_reply_data)
