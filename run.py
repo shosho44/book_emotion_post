@@ -1,5 +1,6 @@
 # coding: UTF-8
 import base64
+import datetime
 import hashlib
 from logging import exception
 
@@ -30,8 +31,21 @@ class PostArticle(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(128), nullable=False)
     user_name = db.Column(db.String(128), nullable=False)
-    book_title = db.Column(db.String(128), nullable=True)
+    book_title = db.Column(db.String(128), nullable=False, default='不明')
     post_content = db.Column(db.String(128), nullable=False)
+    time_stamp = db.Column(db.DATETIME, nullable=False, default=datetime.datetime.now())
+
+
+class ReplyInformation(db.Model):
+    
+    __tablename__ = 'articlereply'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    article_id = db.Column(db.String(128), nullable=False)
+    reply_user_id = db.Column(db.String(128), nullable=False)
+    reply_user_name = db.Column(db.String(128), nullable=False)
+    reply_content = db.Column(db.String(128), nullable=False)
+    time_stamp = db.Column(db.DATETIME, nullable=False, default=datetime.datetime.now())
 
 
 class UserInformation(UserMixin, db.Model):
@@ -248,6 +262,20 @@ def show_upload_user_image():
     return render_template('upload-user-image.html')
 
 
+@app.route('/submit_reply', methods=['POST'])
+def submit_reply():
+    reply_content = request.form['reply_content']
+    article_id = request.form['article_id']
+    
+    reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
+    
+    reply_information = ReplyInformation(article_id=article_id, reply_user_id=current_user.user_id, reply_user_name=reply_user_name, reply_content=reply_content)
+    
+    db.session.add(reply_information)
+    db.session.commit()
+    return reply_thread(article_id)  # 関数名を書く
+
+
 @app.route('/logout_confirm', methods=['POST'])
 @login_required
 def logout_confirm():
@@ -265,6 +293,21 @@ def logout_no():
 def logout_yes():
     logout_user()
     return redirect(url_for('signin'))
+
+
+@app.route('/reply_thread', methods=['GET', 'POST'])
+def reply_thread(article_id=''):
+    if 'article_id' in request.form:
+        article_id = request.form['article_id']
+    
+    article_data = PostArticle.query.filter_by(id=article_id).first()
+    
+    some_reply_data = ReplyInformation.query.filter_by(article_id=article_id).all()
+    
+    if article_data:
+        return render_template('reply_thread.html', article_data=article_data, some_reply_data=some_reply_data)
+    else:
+        return render_template('reply_thread.html', article_data=article_data)
 
 
 if __name__ == '__main__':
