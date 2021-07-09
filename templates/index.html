@@ -26,7 +26,7 @@
         {% for data in some_data %}
             <div style="margin-bottom: 5px;background-color:cornsilk">
                 <div action="/reply_thread" method="POST">
-                    <p>time_stamp: {{ data.created_at }}</p>
+                    <p>time_stamp: {{ data.time_stamp }}</p>
                     <p>投稿内容: {{ data.post_content }}</p>
                     <span>user name: {{ data.user_name }}</span><br>
                     <span>user id: {{ data.user_id }}</span>
