@@ -33,7 +33,7 @@ class PostArticle(db.Model):
     user_name = db.Column(db.String(128), nullable=False)
     book_title = db.Column(db.String(128), nullable=False, default='不明')
     post_content = db.Column(db.String(128), nullable=False)
-    time_stamp = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.Float, nullable=False)
 
 
 class ReplyInformation(db.Model):
@@ -45,7 +45,7 @@ class ReplyInformation(db.Model):
     reply_user_id = db.Column(db.String(128), nullable=False)
     reply_user_name = db.Column(db.String(128), nullable=False)
     reply_content = db.Column(db.String(128), nullable=False)
-    time_stamp = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.Float, nullable=False)
 
 
 class UserInformation(UserMixin, db.Model):
@@ -93,7 +93,7 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])  # index関数を実行している
 def start_exe():
-    some_data = PostArticle.query.order_by(PostArticle.time_stamp.desc()).all()
+    some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
     return render_template('index.html', some_data=some_data)
 
 
@@ -125,7 +125,7 @@ def signup():
 
 @app.route('/index', methods=['GET', 'POST'])
 def post_article_redirect():
-    some_data = PostArticle.query.order_by(PostArticle.time_stamp.desc()).all()
+    some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
     return render_template('index.html', some_data=some_data)
 
 
@@ -143,7 +143,7 @@ def post_article():
     else:
         user_name = is_post_user_name.user_name
     
-    some_data = PostArticle(user_id=user_id, user_name=user_name, book_title=book_title, post_content=post_content, time_stamp=time.time())
+    some_data = PostArticle(user_id=user_id, user_name=user_name, book_title=book_title, post_content=post_content, created_at=time.time())
     
     db.session.add(some_data)
     db.session.commit()
