@@ -34,6 +34,7 @@ class PostArticle(db.Model):
     book_title = db.Column(db.String(128), nullable=False, default='不明')
     post_content = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.Float, nullable=False)
+    good_sum = db.Column(db.Integer, nullable=False, default=0)
 
 
 class ReplyInformation(db.Model):
@@ -46,6 +47,7 @@ class ReplyInformation(db.Model):
     reply_user_name = db.Column(db.String(128), nullable=False)
     reply_content = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.Float, nullable=False)
+    good_sum = db.Column(db.Integer, nullable=False, default=0)
 
 
 class UserInformation(UserMixin, db.Model):
@@ -61,13 +63,13 @@ class UserInformation(UserMixin, db.Model):
     user_image = db.Column(db.LargeBinary, nullable=False, default=default_user_image_base64)
 
 
-class GoodArticle(db.Model):
+class UserAndPushedGoodButtonArticle(db.Model):
     
-    __tablename__ = 'good_sum_of_article'
+    __tablename__ = 'user_and_pushed_good_button_article'
     
     id = db.Column(db.Integer, primary_key=True)
+    user_id_push_article = db.Column(db.String(128), nullable=False)
     article_id = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.String(128), nullable=False)
 
 
 app.secret_key = 'secret key'  # セッションを有効にするために必要
@@ -316,6 +318,34 @@ def reply_thread(article_id=''):
         return render_template('reply_thread.html', article_data=article_data, some_reply_data=some_reply_data)
     else:
         return render_template('reply_thread.html', article_data=article_data)
+
+
+@app.route('/push_good_button', methods=['POST'])
+def push_good_button():
+    article_id = request.form['article_id']
+    
+    article = PostArticle.query.filter_by(id=article_id).first()
+    
+    user_id_push_good_button = current_user.user_id
+    
+    is_user_already_push_good_button = UserAndPushedGoodButtonArticle.query.filter_by(user_id_push_article=user_id_push_good_button, article_id=article_id).first()
+    if is_user_already_push_good_button:
+        article.good_sum -= 1
+        
+        delete_information_of_user_and_pushed_good_button_article = db.session.query(UserAndPushedGoodButtonArticle).filter_by(user_id_push_article=user_id_push_good_button, article_id=article_id).first()
+        db.session.delete(delete_information_of_user_and_pushed_good_button_article)
+        db.session.commit()
+        
+        return redirect(url_for('start_exe'))
+    
+    article.good_sum += 1
+    
+    user_and_pushed_good_button_article = UserAndPushedGoodButtonArticle(user_id_push_article=user_id_push_good_button, article_id=article_id)
+    
+    db.session.add(user_and_pushed_good_button_article)
+    db.session.commit()
+    
+    return redirect(url_for('start_exe'))
 
 
 if __name__ == '__main__':
