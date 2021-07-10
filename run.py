@@ -94,7 +94,8 @@ def load_user(user_id):
 @app.route('/', methods=['GET', 'POST'])  # index関数を実行している
 def start_exe():
     some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
-    return render_template('index.html', some_data=some_data)
+    current_user_id = current_user.user_id
+    return render_template('index.html', some_data=some_data, current_user_id=current_user_id)
 
 
 @app.route('/signin', methods=['GET', 'POST'])
@@ -126,7 +127,8 @@ def signup():
 @app.route('/index', methods=['GET', 'POST'])
 def post_article_redirect():
     some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
-    return render_template('index.html', some_data=some_data)
+    current_user_id = current_user.user_id
+    return render_template('index.html', some_data=some_data, current_user_id=current_user_id)
 
 
 # 投稿した時の処理
