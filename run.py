@@ -348,6 +348,14 @@ def push_good_button():
     return redirect(url_for('start_exe'))
 
 
+@app.route('/show_user_push_good', methods=['GET', 'POST'])
+def show_user_push_good():
+    article_id = request.form['article_id']
+    some_user_push_good_information = UserAndPushedGoodButtonArticle.query.filter_by(article_id=article_id).all()
+    
+    return render_template('show-user-id-push-good.html', some_user_push_good_information=some_user_push_good_information)
+    
+    
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
     db.create_all()

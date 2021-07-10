@@ -45,6 +45,10 @@
                     <input type="hidden" name="article_id" value="{{ data.id }}">
                     <button type="submit">いいね</button>
                 </form>
+                <form action="/show_user_push_good" method="POST">
+                    <input type="hidden" name="article_id" value="{{ data.id }}">
+                    <button type="submit">いいねした人のidをみる</button>
+                </form>
                 {% if data.user_id == current_user_id %}
                     <form action="/delete_article_from_user_profile" method="POST">
                         <input type="hidden" name="article_id" value="{{ data.id }}">
