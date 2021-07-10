@@ -10,16 +10,15 @@
     <div>
         <div style="margin-bottom: 5px;background-color:cornsilk">
             <div>
-                <p>投稿内容: {{ article_data.post_content }}</p>
-                <span>user name: {{ article_data.user_name }}</span><br>
-                <span>user id: {{ article_data.user_id }}</span>
-                <span>book title: {{ article_data.book_title }}</span>
-                <span>いいね数: {{ article_data.good_button_sum }}</span>
+                <p>投稿内容: {{ article_data.reply_content }}</p>
+                <span>user name: {{ article_data.reply_user_name }}</span><br>
+                <span>user id: {{ article_data.reply_user_id }}</span>
+                <span>いいね数: {{ article_data.good_sum }}</span>
             </div>
         </div>
         <div>
             <div>
-                <form action="/submit_reply" method="POST">
+                <form action="/submit_reply_to_reply" method="POST">
                     <input type="hidden" name="article_id" value="{{ article_data.id }}">
                     <input type="text" name="reply_content" placeholder="コメント">
                     <button type="submit">送信する</button>
@@ -28,12 +27,11 @@
             {% for reply_data in some_reply_data %}
                 <div style="margin-bottom: 5px;background-color:rgb(133, 255, 214)">
                     <div>
-                        <span>reply_id: {{ reply_data.id }}</span><br>
                         <span>user name: {{ reply_data.reply_user_name }}</span><br>
                         <span>user id: {{ reply_data.reply_user_id }}</span>
                         <span>content: {{ reply_data.reply_content }}</span>
                         <span>article_id: {{ reply_data.article_id }}</span>
-                        <span>いいね数: {{ reply_data.good_sum }}</span>
+                        <!--<span>いいね数: {{ reply_data.good_button_sum }}</span>-->
                     </div>
                     <form action="/reply_to_reply_thread" method="POST">
                         <input type="hidden" name="article_id" value="{{ reply_data.id }}">

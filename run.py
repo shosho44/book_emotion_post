@@ -42,7 +42,8 @@ class ReplyInformation(db.Model):
     __tablename__ = 'articlereply'
     
     id = db.Column(db.Integer, primary_key=True)
-    article_id = db.Column(db.String(128), nullable=False)
+    article_id = db.Column(db.String(128), nullable=True)
+    reply_to_reply_article_id = db.Column(db.String(128), nullable=True)
     reply_user_id = db.Column(db.String(128), nullable=False)
     reply_user_name = db.Column(db.String(128), nullable=False)
     reply_content = db.Column(db.String(128), nullable=False)
@@ -68,7 +69,16 @@ class UserAndPushedGoodButtonArticle(db.Model):
     __tablename__ = 'user_and_pushed_good_button_article'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id_push_article = db.Column(db.String(128), nullable=False)
+    user_id_push_good_article = db.Column(db.String(128), nullable=False)
+    article_id = db.Column(db.Integer, nullable=False)
+
+
+class UserAndPushedGoodButtonReply(db.Model):
+    
+    __tablename__ = 'user_and_pushed_good_button_reply'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id_push_good_reply = db.Column(db.String(128), nullable=False)
     article_id = db.Column(db.Integer, nullable=False)
 
 
@@ -84,8 +94,6 @@ login_manager.init_app(app)
 # 認証ユーザの呼び出し方を定義しているらしい
 @login_manager.user_loader
 def load_user(user_id):
-    print('user_id:', user_id)
-    print('\n\n')
     is_user_information_exist = UserInformation.query.get(user_id)
     if is_user_information_exist:
         return is_user_information_exist
@@ -328,11 +336,11 @@ def push_good_button():
     
     user_id_push_good_button = current_user.user_id
     
-    is_user_already_push_good_button = UserAndPushedGoodButtonArticle.query.filter_by(user_id_push_article=user_id_push_good_button, article_id=article_id).first()
+    is_user_already_push_good_button = UserAndPushedGoodButtonArticle.query.filter_by(user_id_push_good_article=user_id_push_good_button, article_id=article_id).first()
     if is_user_already_push_good_button:
         article.good_sum -= 1
         
-        delete_information_of_user_and_pushed_good_button_article = db.session.query(UserAndPushedGoodButtonArticle).filter_by(user_id_push_article=user_id_push_good_button, article_id=article_id).first()
+        delete_information_of_user_and_pushed_good_button_article = db.session.query(UserAndPushedGoodButtonArticle).filter_by(user_id_push_good_article=user_id_push_good_button, article_id=article_id).first()
         db.session.delete(delete_information_of_user_and_pushed_good_button_article)
         db.session.commit()
         
@@ -340,7 +348,7 @@ def push_good_button():
     
     article.good_sum += 1
     
-    user_and_pushed_good_button_article = UserAndPushedGoodButtonArticle(user_id_push_article=user_id_push_good_button, article_id=article_id)
+    user_and_pushed_good_button_article = UserAndPushedGoodButtonArticle(user_id_push_good_article=user_id_push_good_button, article_id=article_id)
     
     db.session.add(user_and_pushed_good_button_article)
     db.session.commit()
@@ -354,8 +362,38 @@ def show_user_push_good():
     some_user_push_good_information = UserAndPushedGoodButtonArticle.query.filter_by(article_id=article_id).all()
     
     return render_template('show-user-id-push-good.html', some_user_push_good_information=some_user_push_good_information)
+
+
+@app.route('/reply_to_reply_thread', methods=['GET', 'POST'])
+def reply_to_reply_thread(article_id=''):
+    if 'article_id' in request.form:
+        article_id = request.form['article_id']
     
+    article_data = ReplyInformation.query.filter_by(id=article_id).first()
     
+    some_reply_data = ReplyInformation.query.filter_by(reply_to_reply_article_id=article_id).order_by(ReplyInformation.created_at.desc()).all()
+    
+    if article_data:
+        return render_template('reply_to_reply_thread.html', article_data=article_data, some_reply_data=some_reply_data)
+    else:
+        return render_template('reply_to_reply_thread.html', article_data=article_data)
+
+
+@app.route('/submit_reply_to_reply', methods=['POST'])
+def submit_reply_to_reply():
+    reply_content = request.form['reply_content']
+    reply_to_reply_article_id = request.form['article_id']
+    
+    reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
+    
+    reply_information = ReplyInformation(reply_to_reply_article_id=reply_to_reply_article_id, reply_user_id=current_user.user_id, reply_user_name=reply_user_name, reply_content=reply_content, created_at=time.time())
+    
+    db.session.add(reply_information)
+    db.session.commit()
+    return reply_to_reply_thread(reply_to_reply_article_id)
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
+    db.drop_all()
     db.create_all()
