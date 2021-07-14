@@ -366,17 +366,17 @@ def show_user_push_good():
 
 @app.route('/push_good_button_reply', methods=['POST'])
 def push_good_button_reply():
-    article_id = request.form['article_id']
-    
-    reply = ReplyInformation.query.filter_by(article_id=article_id).first()
+    reply_id = request.form['id']  # 投稿に対するリプのid
+    article_id = request.form['article_id']  # 投稿記事のid
+    reply = ReplyInformation.query.filter_by(id=reply_id).first()
     
     user_id_push_good_button = current_user.user_id
     
-    is_user_already_push_good_button = UserAndPushedGoodButtonReply.query.filter_by(user_id_push_good_reply=user_id_push_good_button, article_id=article_id).first()
+    is_user_already_push_good_button = UserAndPushedGoodButtonReply.query.filter_by(user_id_push_good_reply=user_id_push_good_button, article_id=reply_id).first()
     if is_user_already_push_good_button:
         reply.good_sum -= 1
         
-        delete_information_of_user_and_pushed_good_button_reply = db.session.query(UserAndPushedGoodButtonReply).filter_by(user_id_push_good_reply=user_id_push_good_button, article_id=article_id).first()
+        delete_information_of_user_and_pushed_good_button_reply = db.session.query(UserAndPushedGoodButtonReply).filter_by(user_id_push_good_reply=user_id_push_good_button, article_id=reply_id).first()
         db.session.delete(delete_information_of_user_and_pushed_good_button_reply)
         db.session.commit()
         
@@ -384,12 +384,20 @@ def push_good_button_reply():
     
     reply.good_sum += 1
     
-    user_and_pushed_good_button_article = UserAndPushedGoodButtonReply(user_id_push_good_reply=user_id_push_good_button, article_id=article_id)
+    user_and_pushed_good_button_article = UserAndPushedGoodButtonReply(user_id_push_good_reply=user_id_push_good_button, article_id=reply_id)
     
     db.session.add(user_and_pushed_good_button_article)
     db.session.commit()
     
     return reply_thread(article_id)
+
+
+@app.route('/show_user_push_good_reply', methods=['GET', 'POST'])
+def show_user_push_good_reply():
+    article_id = request.form['id']  # 投稿に対するリプのid
+    some_user_push_good_information = UserAndPushedGoodButtonReply.query.filter_by(article_id=article_id).all()
+    
+    return render_template('show-user-id-push-good-reply.html', some_user_push_good_information=some_user_push_good_information)
 
 
 @app.route('/delete_article_from_user_profile_reply', methods=['POST'])
