@@ -42,8 +42,8 @@ class ReplyInformation(db.Model):
     __tablename__ = 'articlereply'
     
     id = db.Column(db.Integer, primary_key=True)
-    article_id = db.Column(db.String(128), nullable=True)
-    reply_to_reply_article_id = db.Column(db.String(128), nullable=True)
+    article_id = db.Column(db.String(128), nullable=True)  # 投稿に対してのリプ
+    reply_to_reply_article_id = db.Column(db.String(128), nullable=True)  # リプに対してのリプ
     reply_user_id = db.Column(db.String(128), nullable=False)
     reply_user_name = db.Column(db.String(128), nullable=False)
     reply_content = db.Column(db.String(128), nullable=False)
@@ -362,6 +362,17 @@ def show_user_push_good():
     some_user_push_good_information = UserAndPushedGoodButtonArticle.query.filter_by(article_id=article_id).all()
     
     return render_template('show-user-id-push-good.html', some_user_push_good_information=some_user_push_good_information)
+
+
+@app.route('/delete_article_from_user_profile_reply', methods=['POST'])
+def delete_article_from_user_profile_reply():
+    article_id = request.form['article_id']
+    
+    delete_reply_data = db.session.query(ReplyInformation).filter_by(article_id=article_id).first()
+    db.session.delete(delete_reply_data)
+    db.session.commit()
+    
+    return reply_thread(article_id)
 
 
 @app.route('/reply_to_reply_thread', methods=['GET', 'POST'])
