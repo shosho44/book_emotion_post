@@ -54,7 +54,8 @@
                     </form>
                     {% if reply_data.user_id == current_user_id %}
                         <form action="/delete_article_from_user_profile_reply" method="POST">
-                            <input type="hidden" name="article_id" value="{{ reply_data.article_id }}"> <!--valueを直す必要があるかもしれない-->
+                            <input type="hidden" name="id" value="{{ reply_data.id }}"> <!--valueを直す必要があるかもしれない-->
+                            <input type="hidden" name="article_id" value="{{ article_data.id }}">
                             <button type="submit">削除する</button>
                         </form>
                     {% endif %}

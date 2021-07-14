@@ -79,7 +79,7 @@ class UserAndPushedGoodButtonReply(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id_push_good_reply = db.Column(db.String(128), nullable=False)
-    article_id = db.Column(db.Integer, nullable=False)
+    article_id = db.Column(db.Integer, nullable=False)  # ReplyInformationのidを入れる
 
 
 app.secret_key = 'secret key'  # セッションを有効にするために必要
@@ -312,7 +312,7 @@ def submit_reply():
     db.session.commit()
     return reply_thread(article_id)
 
-
+# 直す必要あり。今の書き方だとリプの画面を表示したいのに記事一覧のページが表示される可能性がある。引数に投稿なのかリプなのかを入れてやると良いかもしれない
 @app.route('/reply_thread', methods=['GET', 'POST'])
 def reply_thread(article_id=''):
     if 'article_id' in request.form:
@@ -402,12 +402,13 @@ def show_user_push_good_reply():
 
 @app.route('/delete_article_from_user_profile_reply', methods=['POST'])
 def delete_article_from_user_profile_reply():
-    article_id = request.form['article_id']
+    id = request.form['id']
     
-    delete_reply_data = db.session.query(ReplyInformation).filter_by(article_id=article_id).first()
+    delete_reply_data = db.session.query(ReplyInformation).filter_by(id=id).first()
     db.session.delete(delete_reply_data)
     db.session.commit()
     
+    article_id = request.form['article_id']  # 投稿のid
     return reply_thread(article_id)
 
 

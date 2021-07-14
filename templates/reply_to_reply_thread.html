@@ -42,11 +42,12 @@
                         <button type="submit">このユーザーのプロフィールを見る</button>
                     </form>
                     <form action="/push_good_button_reply" method="POST">
-                        <input type="hidden" name="article_id" value="{{ reply_data.article_id }}">
+                        <input type="hidden" name="id" value="{{ reply_data.id }}"> <!--valueを直す必要があるかもしれない-->
+                        <input type="hidden" name="article_id" value="{{ article_data.id }}">
                         <button type="submit">いいね</button>
                     </form>
                     <form action="/show_user_push_good_reply" method="POST">
-                        <input type="hidden" name="article_id" value="{{ reply_data.article_id }}">
+                        <input type="hidden" name="id" value="{{ reply_data.id }}"> <!--valueを直す必要があるかもしれない-->
                         <button type="submit">いいねした人のidをみる</button>
                     </form>
                     {% if reply_data.user_id == current_user_id %}
