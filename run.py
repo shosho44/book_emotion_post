@@ -312,9 +312,11 @@ def submit_reply():
     db.session.commit()
     return reply_thread(article_id)
 
-# 直す必要あり。今の書き方だとリプの画面を表示したいのに記事一覧のページが表示される可能性がある。引数に投稿なのかリプなのかを入れてやると良いかもしれない
+
 @app.route('/reply_thread', methods=['GET', 'POST'])
 def reply_thread(article_id=''):
+    current_user_id = current_user.user_id
+    
     if 'article_id' in request.form:
         article_id = request.form['article_id']
     
@@ -323,7 +325,7 @@ def reply_thread(article_id=''):
     some_reply_data = ReplyInformation.query.filter_by(article_id=article_id).order_by(ReplyInformation.created_at.desc()).all()
     
     if article_data:
-        return render_template('reply_thread.html', article_data=article_data, some_reply_data=some_reply_data)
+        return render_template('reply_thread.html', article_data=article_data, some_reply_data=some_reply_data, current_user_id=current_user_id)
     else:
         return render_template('reply_thread.html', article_data=article_data)
 
