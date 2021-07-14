@@ -364,6 +364,34 @@ def show_user_push_good():
     return render_template('show-user-id-push-good.html', some_user_push_good_information=some_user_push_good_information)
 
 
+@app.route('/push_good_button_reply', methods=['POST'])
+def push_good_button_reply():
+    article_id = request.form['article_id']
+    
+    reply = ReplyInformation.query.filter_by(article_id=article_id).first()
+    
+    user_id_push_good_button = current_user.user_id
+    
+    is_user_already_push_good_button = UserAndPushedGoodButtonReply.query.filter_by(user_id_push_good_reply=user_id_push_good_button, article_id=article_id).first()
+    if is_user_already_push_good_button:
+        reply.good_sum -= 1
+        
+        delete_information_of_user_and_pushed_good_button_reply = db.session.query(UserAndPushedGoodButtonReply).filter_by(user_id_push_good_reply=user_id_push_good_button, article_id=article_id).first()
+        db.session.delete(delete_information_of_user_and_pushed_good_button_reply)
+        db.session.commit()
+        
+        return reply_thread(article_id)
+    
+    reply.good_sum += 1
+    
+    user_and_pushed_good_button_article = UserAndPushedGoodButtonReply(user_id_push_good_reply=user_id_push_good_button, article_id=article_id)
+    
+    db.session.add(user_and_pushed_good_button_article)
+    db.session.commit()
+    
+    return reply_thread(article_id)
+
+
 @app.route('/delete_article_from_user_profile_reply', methods=['POST'])
 def delete_article_from_user_profile_reply():
     article_id = request.form['article_id']
