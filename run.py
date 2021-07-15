@@ -232,7 +232,7 @@ def user_profile():
                                user_image=user_image, is_current_user_equal_article_user=is_current_user_equal_article_user)
 
 
-@app.route('/edit_user_profile', methods=['POST', 'GET'])
+@app.route('/user_profile/edit', methods=['POST', 'GET'])
 def edit_user_profile():
     user_id = current_user.user_id
     user_name = current_user.user_name
@@ -262,7 +262,7 @@ def update_user_profile():
 @login_required
 def upload_user_image():
     if 'user_image' not in request.files:
-        return redirect(url_for('edit_user_profile'))
+        return redirect(url_for('user_profile/edit'))
     
     user_image = request.files['user_image'].stream.read()
     user_image_base64 = base64.b64encode(user_image)
@@ -272,7 +272,7 @@ def upload_user_image():
     
     db.session.commit()  # 変更するかも。今の段階ではデータベースに登録する必要なしかも
     
-    return redirect(url_for('edit_user_profile'))
+    return redirect(url_for('user_profile/edit'))
 
 
 @app.route('/show_upload_user_image', methods=['GET', 'POST'])
