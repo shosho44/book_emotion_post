@@ -102,7 +102,7 @@ def load_user(user_id):
 
 
 @app.route('/', methods=['GET', 'POST'])  # index関数を実行している
-def start_exe():
+def show_main_page():
     some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
     current_user_id = current_user.user_id
     return render_template('index.html', some_data=some_data, current_user_id=current_user_id)
@@ -126,7 +126,7 @@ def signin_confirm():
     else:
         user = is_user
         login_user(user)
-        return redirect(url_for('start_exe'))
+        return redirect(url_for('show_main_page'))
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -170,7 +170,7 @@ def delete_article_from_user_profile():
     db.session.delete(delete_article_data)
     db.session.commit()
     
-    return redirect(url_for('start_exe'))
+    return redirect(url_for('show_main_page'))  # user_profileを返したい
 
 
 @app.route('/delete_article_from_home', methods=['GET', 'POST'])
@@ -181,7 +181,7 @@ def delete_article_from_home():
     db.session.delete(delete_article_data)
     db.session.commit()
     
-    return redirect(url_for('start_exe'))
+    return redirect(url_for('show_main_page'))
 
 
 @app.route('/signup_confirm', methods=['POST'])
@@ -346,7 +346,7 @@ def push_good_button():
         db.session.delete(delete_information_of_user_and_pushed_good_button_article)
         db.session.commit()
         
-        return redirect(url_for('start_exe'))
+        return redirect(url_for('show_main_page'))
     
     article.good_sum += 1
     
@@ -355,7 +355,7 @@ def push_good_button():
     db.session.add(user_and_pushed_good_button_article)
     db.session.commit()
     
-    return redirect(url_for('start_exe'))
+    return redirect(url_for('show_main_page'))
 
 
 @app.route('/show_user_push_good', methods=['GET', 'POST'])
