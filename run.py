@@ -134,13 +134,6 @@ def signup():
     return render_template('signup.html')
 
 
-@app.route('/index', methods=['GET', 'POST'])
-def post_article_redirect():
-    some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
-    current_user_id = current_user.user_id
-    return render_template('index.html', some_data=some_data, current_user_id=current_user_id)
-
-
 # 投稿した時の処理
 @app.route('/post_article', methods=['POST'])
 def post_article():
@@ -159,7 +152,7 @@ def post_article():
     
     db.session.add(some_data)
     db.session.commit()
-    return redirect(url_for('post_article_redirect'))  # 関数名を書く
+    return redirect(url_for('show_main_page'))  # 関数名を書く
 
 
 @app.route('/delete_article_from_user_profile', methods=['GET', 'POST'])
@@ -201,7 +194,7 @@ def signup_confirm():
     
     user = user_information
     login_user(user)
-    return redirect(url_for('post_article_redirect'))
+    return redirect(url_for('show_main_page'))
 
 
 @app.route('/user_profile', methods=['POST', 'GET'])
