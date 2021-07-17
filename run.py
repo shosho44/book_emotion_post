@@ -280,21 +280,15 @@ def show_upload_user_image():
     return render_template('upload-user-image.html')
 
 
-@app.route('/logout_confirm', methods=['POST'])
+@app.route('/logout', methods=['POST'])
 @login_required
 def logout_confirm():
     return render_template('logout-confirm.html')
 
 
-@app.route('/logout_no', methods=['POST'])
+@app.route('/run-logout', methods=['POST'])
 @login_required
-def logout_no():
-    return redirect(url_for('user_profile'))
-
-
-@app.route('/logout_yes', methods=['POST'])
-@login_required
-def logout_yes():
+def run_logout():  # signinのURLに飛ぶときはログアウトする処理を書けばこの関数をなくして一つにまとめられるかもしれない
     logout_user()
     return redirect(url_for('signin'))
 
