@@ -113,7 +113,7 @@ def signin():
     return render_template('signin.html')
 
 
-@app.route('/signin_confirm', methods=['GET', 'POST'])
+@app.route('/signin-confirm', methods=['GET', 'POST'])
 def signin_confirm():
     user_id = request.form['user_id']
     password = request.form['password']
