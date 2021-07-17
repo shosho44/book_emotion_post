@@ -50,7 +50,7 @@
                     <button type="submit">いいねした人のidをみる</button>
                 </form>
                 {% if data.user_id == current_user_id %}
-                    <form action="/delete_article_from_user_profile" method="POST">
+                    <form action="/delete-article" method="POST">
                         <input type="hidden" name="article_id" value="{{ data.id }}">
                         <button type="submit">削除する</button>
                     </form>
