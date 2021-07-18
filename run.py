@@ -306,7 +306,7 @@ def reply_thread(article_id=''):
         return render_template('reply_thread.html', article_data=article_data)
 
 
-@app.route('/push_good_button', methods=['POST'])
+@app.route('/push-good-button', methods=['POST'])
 def push_good_button():
     article_id = request.form['article_id']
     
