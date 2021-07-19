@@ -186,31 +186,33 @@ def signup_confirm():
     return redirect(url_for('show_main_page'))
 
 
-@app.route('/user_profile', methods=['POST', 'GET'])
-def user_profile():
-    user_id = current_user.user_id
+# 元々はurl:user_profile。user/<str>に変更したい
+@app.route('/user/<string:profile_user_id>', methods=['POST', 'GET'])
+def user_profile(profile_user_id):
+    """user_id = current_user.user_id
     if 'user_id' in request.form:
-        user_id = request.form['user_id']
+        user_id = request.form['user_id']"""
     
-    user = UserInformation.query.filter_by(user_id=user_id).first()
+    user = UserInformation.query.filter_by(user_id=profile_user_id).first()
     user_name = user.user_name
     self_introduction = user.self_introduction
     user_image = user.user_image.decode()
     
-    if current_user.user_id == user_id:
+    current_user_id = current_user.user_id
+    if current_user_id == profile_user_id:
         is_current_user_equal_article_user = True
     else:
         is_current_user_equal_article_user = False
     
-    is_article_exist = PostArticle.query.filter_by(user_id=user_id).all()
+    is_article_exist = PostArticle.query.filter_by(user_id=profile_user_id).all()
     
     if is_article_exist:
         some_article_data = is_article_exist
-        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction,
+        return render_template('user-profile.html', user_id=profile_user_id, user_name=user_name, self_introduction=self_introduction,
                                user_image=user_image, is_current_user_equal_article_user=is_current_user_equal_article_user,
                                some_article_data=some_article_data)
     else:
-        return render_template('user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction,
+        return render_template('user-profile.html', user_id=profile_user_id, user_name=user_name, self_introduction=self_introduction,
                                user_image=user_image, is_current_user_equal_article_user=is_current_user_equal_article_user)
 
 
@@ -224,6 +226,7 @@ def edit_user_profile():
     return render_template('edit-user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction, user_image=user_image)
 
 
+# user_profileに関係している
 @app.route('/update_user_profile', methods=['POST', 'GET'])
 @login_required
 def update_user_profile():
@@ -237,7 +240,7 @@ def update_user_profile():
     
     db.session.commit()
     
-    return redirect(url_for('user_profile'))
+    return redirect(url_for('/user/{}'.format(user_id)))
 
 
 @app.route('/upload_user_image', methods=['GET', 'POST'])
@@ -423,5 +426,5 @@ def submit_reply_to_reply():
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
-    db.drop_all()
+    # db.drop_all()
     db.create_all()

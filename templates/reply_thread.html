@@ -39,7 +39,7 @@
                         <input type="hidden" name="article_id" value="{{ reply_data.id }}">
                         <button type="submit">リプをみる</button>
                     </form>
-                    <form action="/user_profile" method="POST">  <!--ユーザーの写真や名前を押したらsubmitする仕様にしたい-->
+                    <form action="/user/{{ reply_data.reply_user_id }}" method="POST">  <!--ユーザーの写真や名前を押したらsubmitする仕様にしたい-->
                         <input type="hidden" name="user_id" value="{{ reply_data.reply_user_id }}">
                         <button type="submit">このユーザーのプロフィールを見る</button>
                     </form>
