@@ -92,7 +92,7 @@ login_manager.init_app(app)
 
 
 # ログインが必要なページに行くたびに実行される.セッションからユーザーをリロードする。
-# 認証ユーザの呼び出し方を定義しているらしい
+# 認証ユーザの呼び出し方を定義している
 @login_manager.user_loader
 def load_user(user_id):
     is_user_information_exist = UserInformation.query.get(user_id)
@@ -102,7 +102,7 @@ def load_user(user_id):
         return ''
 
 
-@app.route('/', methods=['GET', 'POST'])  # index関数を実行している
+@app.route('/', methods=['GET', 'POST'])
 def show_main_page():
     some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
     current_user_id = current_user.user_id
@@ -153,7 +153,7 @@ def post_article():
     
     db.session.add(some_data)
     db.session.commit()
-    return redirect(url_for('show_main_page'))  # 関数名を書く
+    return redirect(url_for('show_main_page'))
 
 
 @app.route('/delete-article', methods=['GET', 'POST'])
@@ -176,7 +176,7 @@ def signup_confirm():
     
     is_user_exist = UserInformation.query.filter_by(email_address=email_address).first()
     if is_user_exist:
-        return redirect(url_for('signup'))  # リダイレクト先変更する
+        return redirect(url_for('signup'))
     
     user_information = UserInformation(user_id=user_id, password=generate_password_hash(password, method='sha256'), user_name=user_name, email_address=email_address)
     db.session.add(user_information)
@@ -187,7 +187,6 @@ def signup_confirm():
     return redirect(url_for('show_main_page'))
 
 
-# 元々はurl:user_profile。user/<str>に変更したい
 @app.route('/user/<string:profile_user_id>', methods=['POST', 'GET'])
 def user_profile(profile_user_id):
     user = UserInformation.query.filter_by(user_id=profile_user_id).first()
