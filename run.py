@@ -190,11 +190,6 @@ def signup_confirm():
 # 元々はurl:user_profile。user/<str>に変更したい
 @app.route('/user/<string:profile_user_id>', methods=['POST', 'GET'])
 def user_profile(profile_user_id):
-    """user_id = current_user.user_id
-    if 'user_id' in request.form:
-        user_id = request.form['user_id']"""
-    print('\n\n')
-    print(request.path)
     user = UserInformation.query.filter_by(user_id=profile_user_id).first()
     user_name = user.user_name
     self_introduction = user.self_introduction
