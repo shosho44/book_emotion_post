@@ -245,9 +245,9 @@ def update_user_profile(profile_user_id):
     return redirect(url_for('user_profile', profile_user_id=user_id))
 
 
-@app.route('/upload_user_image', methods=['GET', 'POST'])
+@app.route('/user/<string:profile_user_id>/edit/image/upload', methods=['GET', 'POST'])
 @login_required
-def upload_user_image():
+def upload_user_image(profile_user_id):
     current_user_id = current_user.user_id
     if 'user_image' not in request.files:
         return redirect(url_for('/user/{}/edit'.format(current_user_id)))
@@ -260,12 +260,13 @@ def upload_user_image():
     
     db.session.commit()  # 変更するかも。今の段階ではデータベースに登録する必要なしかも
     
-    return redirect(url_for('/user/{}/edit'.format(current_user_id)))  # url_forの中身違う
+    return redirect(url_for('user_profile', profile_user_id=profile_user_id))
 
 
-@app.route('/show_upload_user_image', methods=['GET', 'POST'])
-def show_upload_user_image():
-    return render_template('upload-user-image.html')
+@app.route('/user/<string:profile_user_id>/edit/image', methods=['GET', 'POST'])
+def show_upload_user_image(profile_user_id):
+    current_user_id = current_user.user_id
+    return render_template('upload-user-image.html', user_id=current_user_id)
 
 
 @app.route('/logout', methods=['POST'])
