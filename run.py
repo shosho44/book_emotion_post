@@ -18,6 +18,7 @@ app = flask.Flask(__name__, static_folder='img')
 # データベースの設定
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db'  # sqliteを使っている
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['APPLICATION_ROOT'] = '/'
 db = SQLAlchemy(app)
 
 with open('img/sample_image_human.png', mode='rb') as f:
@@ -192,7 +193,8 @@ def user_profile(profile_user_id):
     """user_id = current_user.user_id
     if 'user_id' in request.form:
         user_id = request.form['user_id']"""
-    
+    print('\n\n')
+    print(request.path)
     user = UserInformation.query.filter_by(user_id=profile_user_id).first()
     user_name = user.user_name
     self_introduction = user.self_introduction
@@ -216,8 +218,8 @@ def user_profile(profile_user_id):
                                user_image=user_image, is_current_user_equal_article_user=is_current_user_equal_article_user)
 
 
-@app.route('/user_profile/edit', methods=['POST', 'GET'])
-def edit_user_profile():
+@app.route('/user/<string:profile_user_id>/edit', methods=['POST', 'GET'])
+def edit_user_profile(profile_user_id):
     user_id = current_user.user_id
     user_name = current_user.user_name
     self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
@@ -227,9 +229,9 @@ def edit_user_profile():
 
 
 # user_profileに関係している
-@app.route('/update_user_profile', methods=['POST', 'GET'])
+@app.route('/user/<string:profile_user_id>/update', methods=['POST', 'GET'])
 @login_required
-def update_user_profile():
+def update_user_profile(profile_user_id):
     user_id = current_user.user_id
     user_name = request.form['user_name']
     self_introduction = request.form['self_introduction']
@@ -240,14 +242,15 @@ def update_user_profile():
     
     db.session.commit()
     
-    return redirect(url_for('/user/{}'.format(user_id)))
+    return redirect(url_for('user_profile', profile_user_id=user_id))
 
 
 @app.route('/upload_user_image', methods=['GET', 'POST'])
 @login_required
 def upload_user_image():
+    current_user_id = current_user.user_id
     if 'user_image' not in request.files:
-        return redirect(url_for('user_profile/edit'))
+        return redirect(url_for('/user/{}/edit'.format(current_user_id)))
     
     user_image = request.files['user_image'].stream.read()
     user_image_base64 = base64.b64encode(user_image)
@@ -257,7 +260,7 @@ def upload_user_image():
     
     db.session.commit()  # 変更するかも。今の段階ではデータベースに登録する必要なしかも
     
-    return redirect(url_for('user_profile/edit'))
+    return redirect(url_for('/user/{}/edit'.format(current_user_id)))  # url_forの中身違う
 
 
 @app.route('/show_upload_user_image', methods=['GET', 'POST'])
