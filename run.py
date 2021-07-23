@@ -276,7 +276,7 @@ def run_logout():  # signinのURLに飛ぶときはログアウトする処理�
     return redirect(url_for('signin'))
 
 
-@app.route('/submit_reply', methods=['POST'])
+@app.route('/submit-reply', methods=['POST'])
 def submit_reply():
     reply_content = request.form['reply_content']
     article_id = request.form['article_id']
