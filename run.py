@@ -419,7 +419,7 @@ def submit_reply_to_reply():
     
     db.session.add(reply_information)
     db.session.commit()
-    return reply_to_reply(reply_to_reply_article_id)
+    return redirect(url_for('reply_to_reply', id=reply_to_reply_article_id))
 
 
 if __name__ == '__main__':
