@@ -293,9 +293,6 @@ def submit_reply():
 def reply_thread(article_id=''):
     current_user_id = current_user.user_id
     
-    if 'article_id' in request.form:
-        article_id = request.form['article_id']
-    
     article_data = PostArticle.query.filter_by(id=article_id).first()
     
     some_reply_data = ReplyInformation.query.filter_by(article_id=article_id).order_by(ReplyInformation.created_at.desc()).all()

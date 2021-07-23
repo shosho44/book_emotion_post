@@ -40,7 +40,6 @@
         {% for data in some_article_data %}
             <div style="margin-bottom: 5px;background-color:cornsilk">
                 <form action="/reply/{{ data.id }}" method="POST">
-                    <input type="hidden" name="article_id" value="{{ data.id }}">
                     <button type="submit">リプをみる</button>
                 </form>
                 <p>投稿内容: {{ data.post_content }}</p>
