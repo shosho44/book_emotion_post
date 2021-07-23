@@ -391,16 +391,16 @@ def delete_article_from_user_profile_reply():
     return reply_thread(article_id)
 
 
-@app.route('/reply_to_reply_thread', methods=['GET', 'POST'])
-def reply_to_reply_thread(article_id=''):
+@app.route('/reply-to-reply/<string:id>', methods=['GET', 'POST'])
+def reply_to_reply(id=''):
     current_user_id = current_user.user_id
     
     if 'article_id' in request.form:
-        article_id = request.form['article_id']
+        id = request.form['article_id']
     
-    article_data = ReplyInformation.query.filter_by(id=article_id).first()
+    article_data = ReplyInformation.query.filter_by(id=id).first()
     
-    some_reply_data = ReplyInformation.query.filter_by(reply_to_reply_article_id=article_id).order_by(ReplyInformation.created_at.desc()).all()
+    some_reply_data = ReplyInformation.query.filter_by(reply_to_reply_article_id=id).order_by(ReplyInformation.created_at.desc()).all()
     
     if article_data:
         return render_template('reply_to_reply_thread.html', article_data=article_data, some_reply_data=some_reply_data, current_user_id=current_user_id)
@@ -419,7 +419,7 @@ def submit_reply_to_reply():
     
     db.session.add(reply_information)
     db.session.commit()
-    return reply_to_reply_thread(reply_to_reply_article_id)
+    return reply_to_reply(reply_to_reply_article_id)
 
 
 if __name__ == '__main__':

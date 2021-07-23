@@ -35,7 +35,7 @@
                         <span>article_id: {{ reply_data.article_id }}</span>
                         <span>いいね数: {{ reply_data.good_sum }}</span>
                     </div>
-                    <form action="/reply_to_reply_thread" method="POST">
+                    <form action="/reply-to-reply/{{ reply_data.id }}" method="POST">
                         <input type="hidden" name="article_id" value="{{ reply_data.id }}">
                         <button type="submit">リプをみる</button>
                     </form>
