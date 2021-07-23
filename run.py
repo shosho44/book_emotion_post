@@ -343,7 +343,7 @@ def show_user_push_good(article_id=''):
     return render_template('show-user-id-push-good.html', some_user_push_good_information=some_user_push_good_information)
 
 
-@app.route('/push_good_button_reply', methods=['POST'])
+@app.route('/push-good-button-reply', methods=['POST'])
 def push_good_button_reply():
     reply_id = request.form['id']  # 投稿に対するリプのid
     article_id = request.form['article_id']  # 投稿記事のid
