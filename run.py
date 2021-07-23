@@ -1,19 +1,13 @@
 # coding: UTF-8
 import base64
-import hashlib
-from logging import exception
 import time
-
-import flask
-from flask import Flask, Response, abort, render_template, url_for, flash, redirect, request
+from flask import Flask, render_template, url_for, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user, login_user, logout_user, login_required, UserMixin
-from collections import defaultdict
-from flask_login import login_user
 import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
 
-app = flask.Flask(__name__, static_folder='img')
+app = Flask(__name__, static_folder='img')
 
 # データベースの設定
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db'  # sqliteを使っている
@@ -153,6 +147,7 @@ def post_article():
     
     db.session.add(some_data)
     db.session.commit()
+    
     return redirect(url_for('show_main_page'))
 
 
@@ -178,12 +173,14 @@ def signup_confirm():
     if is_user_exist:
         return redirect(url_for('signup'))
     
-    user_information = UserInformation(user_id=user_id, password=generate_password_hash(password, method='sha256'), user_name=user_name, email_address=email_address)
+    user_information = UserInformation(user_id=user_id, password=generate_password_hash(password, method='sha256'),
+                                       user_name=user_name, email_address=email_address)
     db.session.add(user_information)
     db.session.commit()
     
     user = user_information
     login_user(user)
+    
     return redirect(url_for('show_main_page'))
 
 
@@ -260,6 +257,7 @@ def upload_user_image(profile_user_id):
 @app.route('/user/<string:profile_user_id>/edit/image', methods=['GET', 'POST'])
 def show_upload_user_image(profile_user_id):
     current_user_id = current_user.user_id
+    
     return render_template('upload-user-image.html', user_id=current_user_id)
 
 
@@ -283,7 +281,8 @@ def submit_reply():
     
     reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
     
-    reply_information = ReplyInformation(article_id=article_id, reply_user_id=current_user.user_id, reply_user_name=reply_user_name, reply_content=reply_content, created_at=time.time())
+    reply_information = ReplyInformation(article_id=article_id, reply_user_id=current_user.user_id,
+                                         reply_user_name=reply_user_name, reply_content=reply_content, created_at=time.time())
     
     db.session.add(reply_information)
     db.session.commit()
@@ -315,11 +314,13 @@ def push_good_button():
     
     user_id_push_good_button = current_user.user_id
     
-    is_user_already_push_good_button = UserAndPushedGoodButtonArticle.query.filter_by(user_id_push_good_article=user_id_push_good_button, article_id=article_id).first()
+    is_user_already_push_good_button = UserAndPushedGoodButtonArticle.query.filter_by(
+        user_id_push_good_article=user_id_push_good_button, article_id=article_id).first()
     if is_user_already_push_good_button:
         article.good_sum -= 1
         
-        delete_information_of_user_and_pushed_good_button_article = db.session.query(UserAndPushedGoodButtonArticle).filter_by(user_id_push_good_article=user_id_push_good_button, article_id=article_id).first()
+        delete_information_of_user_and_pushed_good_button_article = db.session.query(UserAndPushedGoodButtonArticle).filter_by(
+            user_id_push_good_article=user_id_push_good_button, article_id=article_id).first()
         db.session.delete(delete_information_of_user_and_pushed_good_button_article)
         db.session.commit()
         
@@ -351,11 +352,13 @@ def push_good_button_reply():
     
     user_id_push_good_button = current_user.user_id
     
-    is_user_already_push_good_button = UserAndPushedGoodButtonReply.query.filter_by(user_id_push_good_reply=user_id_push_good_button, article_id=reply_id).first()
+    is_user_already_push_good_button = UserAndPushedGoodButtonReply.query.filter_by(user_id_push_good_reply=user_id_push_good_button,
+                                                                                    article_id=reply_id).first()
     if is_user_already_push_good_button:
         reply.good_sum -= 1
         
-        delete_information_of_user_and_pushed_good_button_reply = db.session.query(UserAndPushedGoodButtonReply).filter_by(user_id_push_good_reply=user_id_push_good_button, article_id=reply_id).first()
+        delete_information_of_user_and_pushed_good_button_reply = db.session.query(UserAndPushedGoodButtonReply).filter_by(
+            user_id_push_good_reply=user_id_push_good_button, article_id=reply_id).first()
         db.session.delete(delete_information_of_user_and_pushed_good_button_reply)
         db.session.commit()
         
@@ -388,6 +391,7 @@ def delete_article_from_user_profile_reply():
     db.session.commit()
     
     article_id = request.form['article_id']  # 投稿のid
+    
     return redirect(url_for('reply_thread', article_id=article_id))
 
 
@@ -403,7 +407,8 @@ def reply_to_reply(id=''):
     some_reply_data = ReplyInformation.query.filter_by(reply_to_reply_article_id=id).order_by(ReplyInformation.created_at.desc()).all()
     
     if article_data:
-        return render_template('reply_to_reply_thread.html', article_data=article_data, some_reply_data=some_reply_data, current_user_id=current_user_id)
+        return render_template('reply_to_reply_thread.html', article_data=article_data, some_reply_data=some_reply_data,
+                               current_user_id=current_user_id)
     else:
         return render_template('reply_to_reply_thread.html', article_data=article_data)
 
@@ -415,10 +420,12 @@ def submit_reply_to_reply():
     
     reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
     
-    reply_information = ReplyInformation(reply_to_reply_article_id=reply_to_reply_article_id, reply_user_id=current_user.user_id, reply_user_name=reply_user_name, reply_content=reply_content, created_at=time.time())
+    reply_information = ReplyInformation(reply_to_reply_article_id=reply_to_reply_article_id, reply_user_id=current_user.user_id,
+                                         reply_user_name=reply_user_name, reply_content=reply_content, created_at=time.time())
     
     db.session.add(reply_information)
     db.session.commit()
+    
     return redirect(url_for('reply_to_reply', id=reply_to_reply_article_id))
 
 
