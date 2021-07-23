@@ -379,7 +379,7 @@ def show_user_push_good_reply(artcile_id=''):
     return render_template('show-user-id-push-good-reply.html', some_user_push_good_information=some_user_push_good_information)
 
 
-@app.route('/delete_article_from_user_profile_reply', methods=['POST'])
+@app.route('/delete-reply', methods=['POST'])
 def delete_article_from_user_profile_reply():
     id = request.form['id']
     
