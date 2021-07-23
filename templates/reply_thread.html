@@ -49,7 +49,6 @@
                         <button type="submit">いいね</button>
                     </form>
                     <form action="/reply/{{ reply_data.id }}/likes" method="POST">
-                        <input type="hidden" name="id" value="{{ reply_data.id }}"> <!--valueを直す必要があるかもしれない-->
                         <button type="submit">いいねした人のidをみる</button>
                     </form>
                     {% if reply_data.reply_user_id == current_user_id %}

@@ -370,9 +370,8 @@ def push_good_button_reply():
     return redirect(url_for('reply_thread', article_id=article_id))
 
 
-@app.route('/reply/<string:artcile_id>/likes', methods=['GET', 'POST'])
-def show_user_push_good_reply(artcile_id=''):
-    article_id = request.form['id']  # 投稿に対するリプのid
+@app.route('/reply/<string:article_id>/likes', methods=['GET', 'POST'])
+def show_user_push_good_reply(article_id=''):
     some_user_push_good_information = UserAndPushedGoodButtonReply.query.filter_by(article_id=article_id).all()
     
     return render_template('show-user-id-push-good-reply.html', some_user_push_good_information=some_user_push_good_information)
