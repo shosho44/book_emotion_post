@@ -48,7 +48,7 @@
                         <input type="hidden" name="article_id" value="{{ article_data.id }}">
                         <button type="submit">いいね</button>
                     </form>
-                    <form action="/show_user_push_good_reply" method="POST">
+                    <form action="/reply/{{ reply_data.id }}/likes" method="POST">
                         <input type="hidden" name="id" value="{{ reply_data.id }}"> <!--valueを直す必要があるかもしれない-->
                         <button type="submit">いいねした人のidをみる</button>
                     </form>

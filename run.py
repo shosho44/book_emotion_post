@@ -371,8 +371,9 @@ def push_good_button_reply():
     return redirect(url_for('reply_thread', article_id=article_id))
 
 
-@app.route('/show_user_push_good_reply', methods=['GET', 'POST'])
-def show_user_push_good_reply():
+# show_user_push_good_replyを変更
+@app.route('/reply/<string:artcile_id>/likes', methods=['GET', 'POST'])
+def show_user_push_good_reply(artcile_id=''):
     article_id = request.form['id']  # 投稿に対するリプのid
     some_user_push_good_information = UserAndPushedGoodButtonReply.query.filter_by(article_id=article_id).all()
     
