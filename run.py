@@ -136,7 +136,7 @@ def signup():
 
 
 # 投稿した時の処理
-@app.route('/post_article', methods=['POST'])
+@app.route('/post-article', methods=['POST'])
 def post_article():
     post_content = request.form['post-article']
     book_title = request.form['book-title']
