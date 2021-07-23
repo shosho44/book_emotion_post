@@ -408,7 +408,7 @@ def reply_to_reply(id=''):
         return render_template('reply_to_reply_thread.html', article_data=article_data)
 
 
-@app.route('/submit_reply_to_reply', methods=['POST'])
+@app.route('/submit-reply-to-reply', methods=['POST'])
 def submit_reply_to_reply():
     reply_content = request.form['reply_content']
     reply_to_reply_article_id = request.form['article_id']
