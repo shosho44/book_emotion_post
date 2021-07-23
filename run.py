@@ -394,9 +394,6 @@ def delete_article_from_user_profile_reply():
 def reply_to_reply(id=''):
     current_user_id = current_user.user_id
     
-    if 'article_id' in request.form:
-        id = request.form['article_id']
-    
     article_data = ReplyInformation.query.filter_by(id=id).first()
     
     some_reply_data = ReplyInformation.query.filter_by(reply_to_reply_article_id=id).order_by(ReplyInformation.created_at.desc()).all()

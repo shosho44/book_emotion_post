@@ -36,7 +36,6 @@
                         <span>いいね数: {{ reply_data.good_sum }}</span>
                     </div>
                     <form action="/reply-to-reply/{{ reply_data.id }}" method="POST">
-                        <input type="hidden" name="article_id" value="{{ reply_data.id }}">
                         <button type="submit">リプをみる</button>
                     </form>
                     <form action="/user/{{ reply_data.reply_user_id }}" method="POST">  <!--ユーザーの写真や名前を押したらsubmitする仕様にしたい-->
