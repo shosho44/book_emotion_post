@@ -167,7 +167,7 @@ def delete_article():
     return redirect(url_for('show_main_page'))  # user-profileから投稿削除した時はuser-profileを返したい
 
 
-@app.route('/signup_confirm', methods=['POST'])
+@app.route('/signup-confirm', methods=['POST'])
 def signup_confirm():
     user_id = request.form['user_id']
     user_name = request.form['user_name']
