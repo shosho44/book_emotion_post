@@ -335,7 +335,6 @@ def push_good_button():
 
 @app.route('/passage/<string:article_id>/likes', methods=['GET', 'POST'])
 def show_user_push_good(article_id=''):
-    article_id = request.form['article_id']
     some_user_push_good_information = UserAndPushedGoodButtonArticle.query.filter_by(article_id=article_id).all()
     
     return render_template('show-user-id-push-good.html', some_user_push_good_information=some_user_push_good_information)
