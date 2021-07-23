@@ -287,10 +287,10 @@ def submit_reply():
     
     db.session.add(reply_information)
     db.session.commit()
-    return reply_thread(article_id)
+    return redirect(url_for('reply_thread', article_id=article_id))
 
 
-@app.route('/reply_thread', methods=['GET', 'POST'])
+@app.route('/reply/<string:article_id>', methods=['GET', 'POST'])
 def reply_thread(article_id=''):
     current_user_id = current_user.user_id
     
@@ -359,7 +359,7 @@ def push_good_button_reply():
         db.session.delete(delete_information_of_user_and_pushed_good_button_reply)
         db.session.commit()
         
-        return reply_thread(article_id)
+        return redirect(url_for('reply_thread', article_id=article_id))
     
     reply.good_sum += 1
     
@@ -368,7 +368,7 @@ def push_good_button_reply():
     db.session.add(user_and_pushed_good_button_article)
     db.session.commit()
     
-    return reply_thread(article_id)
+    return redirect(url_for('reply_thread', article_id=article_id))
 
 
 @app.route('/show_user_push_good_reply', methods=['GET', 'POST'])
@@ -388,7 +388,7 @@ def delete_article_from_user_profile_reply():
     db.session.commit()
     
     article_id = request.form['article_id']  # 投稿のid
-    return reply_thread(article_id)
+    return redirect(url_for('reply_thread', article_id=article_id))
 
 
 @app.route('/reply-to-reply/<string:id>', methods=['GET', 'POST'])
