@@ -9,12 +9,8 @@
 <body>
     <div>
         <h1>ログアウトしますか？</h1>
-        <form action="run-logout" method="POST" enctype="multipart/form-data">
-            <button type="submit">はい</button>
-        </form>
-        <form action="user_profile" method="GET" enctype="multipart/form-data">  <!--リング先変更する必要あり-->
-            <button type="submit">いいえ</button>
-        </form>
+        <a href="/run-logout">はい</a>
+        <a href="/user/{{ user_id }}">いいえ</a>
     </div>
 
 </body>

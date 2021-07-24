@@ -8,9 +8,7 @@
 </head>
 <body>
     <div>
-        <form action="{{ url_for('show_upload_user_image', profile_user_id=user_id)}}" method="GET" enctype="multipart/form-data">
-            <button type="submit"><img src="data:image/png;base64, {{ user_image }}" width="150px" height="150px"></button>  <!-- 変更する必要がある。一時的に幅高さ写真指定している。-->
-        </form>
+        <a href="{{ url_for('show_upload_user_image', profile_user_id=user_id)}}"><button type="submit"><img src="data:image/png;base64, {{ user_image }}" width="150px" height="150px"></button></a>
     </div>
     <div>
         <form action="{{ url_for('update_user_profile', profile_user_id=user_id) }}" method="POST" enctype="multipart/form-data">

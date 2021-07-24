@@ -265,7 +265,8 @@ def show_upload_user_image(profile_user_id=''):
 @app.route('/logout', methods=['GET'])
 @login_required
 def logout_confirm():
-    return render_template('logout-confirm.html')
+    user_id = current_user.user_id
+    return render_template('logout-confirm.html', user_id=user_id)
 
 
 @app.route('/run-logout', methods=['POST'])
