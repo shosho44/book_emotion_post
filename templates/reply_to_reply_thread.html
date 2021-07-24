@@ -18,8 +18,7 @@
         </div>
         <div>
             <div>
-                <form action="/submit-reply-to-reply" method="POST">
-                    <input type="hidden" name="article_id" value="{{ article_data.id }}">
+                <form action="/submit-reply-to-reply/{{ article_data.id }}" method="POST">
                     <input type="text" name="reply_content" placeholder="コメント">
                     <button type="submit">送信する</button>
                 </form>
@@ -30,28 +29,23 @@
                         <span>user name: {{ reply_data.reply_user_name }}</span><br>
                         <span>user id: {{ reply_data.reply_user_id }}</span>
                         <span>content: {{ reply_data.reply_content }}</span>
-                        <span>article_id: {{ reply_data.article_id }}</span>
-                        <!--<span>いいね数: {{ reply_data.good_button_sum }}</span>-->
+                        <span>article_id: {{ reply_data.reply_to_reply_article_id }}</span>
+                        <span>いいね数: {{ reply_data.good_sum }}</span>
                     </div>
                     <form action="/reply-to-reply/{{ reply_data.id }}" method="POST">
                         <button type="submit">リプをみる</button>
                     </form>
                     <form action="/user/{{ reply_data.reply_user_id }}" method="POST">  <!--ユーザーの写真や名前を押したらsubmitする仕様にしたい-->
-                        <input type="hidden" name="user_id" value="{{ reply_data.reply_user_id }}">
                         <button type="submit">このユーザーのプロフィールを見る</button>
                     </form>
-                    <form action="/push-good-button-reply" method="POST">
-                        <input type="hidden" name="id" value="{{ reply_data.id }}"> <!--valueを直す必要があるかもしれない-->
-                        <input type="hidden" name="article_id" value="{{ article_data.id }}">
+                    <form action="/reply/{{ reply_data.id }}/push-like/{{ article_data.id }}" method="POST">
                         <button type="submit">いいね</button>
                     </form>
                     <form action="/reply/{{ reply_data.id }}/likes" method="POST">
                         <button type="submit">いいねした人のidをみる</button>
                     </form>
                     {% if reply_data.reply_user_id == current_user_id %}
-                        <form action="/delete-reply" method="POST">
-                            <input type="hidden" name="id" value="{{ reply_data.id }}"> <!--valueを直す必要があるかもしれない-->
-                            <input type="hidden" name="article_id" value="{{ article_data.id }}">
+                        <form action="/reply/{{ reply_data.id }}/delete/{{ article_data.id }}" method="POST">
                             <button type="submit">削除する</button>
                         </form>
                     {% endif %}

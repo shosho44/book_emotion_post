@@ -151,12 +151,10 @@ def post_article():
     return redirect(url_for('show_main_page'))
 
 
-@app.route('/delete-article', methods=['GET', 'POST'])
-def delete_article():
-    article_id = request.form['article_id']
-    
-    delete_article_data = db.session.query(PostArticle).filter_by(id=article_id).first()
-    db.session.delete(delete_article_data)
+@app.route('/passage/<string:article_id>/delete', methods=['GET', 'POST'])
+def delete_passage(article_id=''):
+    delete_passage_data = db.session.query(PostArticle).filter_by(id=article_id).first()
+    db.session.delete(delete_passage_data)
     db.session.commit()
     
     return redirect(url_for('show_main_page'))  # user-profileから投稿削除した時はuser-profileを返したい
@@ -185,7 +183,7 @@ def signup_confirm():
 
 
 @app.route('/user/<string:profile_user_id>', methods=['POST', 'GET'])
-def user_profile(profile_user_id):
+def user_profile(profile_user_id=''):
     user = UserInformation.query.filter_by(user_id=profile_user_id).first()
     user_name = user.user_name
     self_introduction = user.self_introduction
@@ -209,8 +207,9 @@ def user_profile(profile_user_id):
                                user_image=user_image, is_current_user_equal_article_user=is_current_user_equal_article_user)
 
 
+# profile_user_idがcurrent_user_idと違う場合アクセス権限がない旨を表示する
 @app.route('/user/<string:profile_user_id>/edit', methods=['POST', 'GET'])
-def edit_user_profile(profile_user_id):
+def edit_user_profile(profile_user_id=''):
     user_id = current_user.user_id
     user_name = current_user.user_name
     self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
@@ -222,7 +221,7 @@ def edit_user_profile(profile_user_id):
 # user_profileに関係している
 @app.route('/user/<string:profile_user_id>/update', methods=['POST', 'GET'])
 @login_required
-def update_user_profile(profile_user_id):
+def update_user_profile(profile_user_id=''):
     user_id = current_user.user_id
     user_name = request.form['user_name']
     self_introduction = request.form['self_introduction']
@@ -236,9 +235,10 @@ def update_user_profile(profile_user_id):
     return redirect(url_for('user_profile', profile_user_id=user_id))
 
 
+# profile_user_idがcurrent_user_idと違う場合アクセス権限がない旨を表示する
 @app.route('/user/<string:profile_user_id>/edit/image/upload', methods=['GET', 'POST'])
 @login_required
-def upload_user_image(profile_user_id):
+def upload_user_image(profile_user_id=''):
     current_user_id = current_user.user_id
     if 'user_image' not in request.files:
         return redirect(url_for('/user/{}/edit'.format(current_user_id)))
@@ -254,8 +254,9 @@ def upload_user_image(profile_user_id):
     return redirect(url_for('user_profile', profile_user_id=profile_user_id))
 
 
+# アクセス権限がない旨を表示する
 @app.route('/user/<string:profile_user_id>/edit/image', methods=['GET', 'POST'])
-def show_upload_user_image(profile_user_id):
+def show_upload_user_image(profile_user_id=''):
     current_user_id = current_user.user_id
     
     return render_template('upload-user-image.html', user_id=current_user_id)
@@ -274,10 +275,9 @@ def run_logout():  # signinのURLに飛ぶときはログアウトする処理�
     return redirect(url_for('signin'))
 
 
-@app.route('/submit-reply', methods=['POST'])
-def submit_reply():
+@app.route('/submit-reply/<string:article_id>', methods=['POST'])
+def submit_reply(article_id=''):
     reply_content = request.form['reply_content']
-    article_id = request.form['article_id']
     
     reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
     
@@ -303,10 +303,8 @@ def reply_thread(article_id=''):
         return render_template('reply_thread.html', article_data=article_data)
 
 
-@app.route('/push-good-button', methods=['POST'])
-def push_good_button():
-    article_id = request.form['article_id']
-    
+@app.route('/passage/<string:article_id>/push-like', methods=['POST'])
+def push_good_button(article_id=''):
     article = PostArticle.query.filter_by(id=article_id).first()
     
     user_id_push_good_button = current_user.user_id
@@ -340,10 +338,9 @@ def show_user_push_good(article_id=''):
     return render_template('show-user-id-push-good.html', some_user_push_good_information=some_user_push_good_information)
 
 
-@app.route('/push-good-button-reply', methods=['POST'])
-def push_good_button_reply():
-    reply_id = request.form['id']  # 投稿に対するリプのid
-    article_id = request.form['article_id']  # 投稿記事のid
+# /push-good-button-reply
+@app.route('/reply/<string:reply_id>/push-like/<string:article_id>', methods=['POST'])
+def push_good_button_reply(reply_id='', article_id=''):
     reply = ReplyInformation.query.filter_by(id=reply_id).first()
     
     user_id_push_good_button = current_user.user_id
@@ -377,15 +374,14 @@ def show_user_push_good_reply(article_id=''):
     return render_template('show-user-id-push-good-reply.html', some_user_push_good_information=some_user_push_good_information)
 
 
-@app.route('/delete-reply', methods=['POST'])
-def delete_article_from_user_profile_reply():
-    id = request.form['id']
+# delete-reply
+@app.route('/reply/<string:reply_id>/delete/<article_id>', methods=['POST'])
+def delete_article_from_user_profile_reply(reply_id='', article_id=''):
+    id = reply_id
     
     delete_reply_data = db.session.query(ReplyInformation).filter_by(id=id).first()
     db.session.delete(delete_reply_data)
     db.session.commit()
-    
-    article_id = request.form['article_id']  # 投稿のid
     
     return redirect(url_for('reply_thread', article_id=article_id))
 
@@ -405,10 +401,9 @@ def reply_to_reply(id=''):
         return render_template('reply_to_reply_thread.html', article_data=article_data)
 
 
-@app.route('/submit-reply-to-reply', methods=['POST'])
-def submit_reply_to_reply():
+@app.route('/submit-reply-to-reply/<string:reply_to_reply_article_id>', methods=['POST'])
+def submit_reply_to_reply(reply_to_reply_article_id=''):
     reply_content = request.form['reply_content']
-    reply_to_reply_article_id = request.form['article_id']
     
     reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
     

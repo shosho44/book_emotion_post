@@ -37,19 +37,16 @@
                     <button type="submit">リプをみる</button>
                 </form>
                 <form action="/user/{{ data.user_id }}" method="POST">  <!--ユーザーの写真や名前を押したらsubmitする仕様にしたい-->
-                    <input type="hidden" name="user_id" value="{{ data.user_id }}">
                     <button type="submit">このユーザーのプロフィールを見る</button>
                 </form>
-                <form action="/push-good-button" method="POST">
-                    <input type="hidden" name="article_id" value="{{ data.id }}">
+                <form action="/passage/{{ data.id }}/push-like" method="POST">
                     <button type="submit">いいね</button>
                 </form>
                 <form action="/passage/{{ data.id }}/likes" method="POST">
                     <button type="submit">いいねした人のidをみる</button>
                 </form>
                 {% if data.user_id == current_user_id %}
-                    <form action="/delete-article" method="POST">
-                        <input type="hidden" name="article_id" value="{{ data.id }}">
+                    <form action="/passage/{{ data.id }}/delete" method="POST">
                         <button type="submit">削除する</button>
                     </form>
                 {% endif %}
