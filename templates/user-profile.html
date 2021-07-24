@@ -39,7 +39,7 @@
                 <span>user name: {{ data.user_name }}</span><br>
                 <span>user id: {{ data.user_id }}</span><br>
                 <span>book title: {{ data.book_title }}</span><br>
-                <span>いいね数: {{ data.good_button_sum }}</span><br>
+                <span>いいね数: {{ data.good_sum }}</span><br>
                 <a href="/reply/{{ data.id }}">リプをみる</a>
                 {% if is_current_user_equal_article_user == True %}
                     <form action="/passage/{{ data.id }}/delete" method="POST">
