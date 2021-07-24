@@ -32,16 +32,16 @@
                         <span>article_id: {{ reply_data.reply_to_reply_article_id }}</span>
                         <span>いいね数: {{ reply_data.good_sum }}</span>
                     </div>
-                    <form action="/reply-to-reply/{{ reply_data.id }}" method="POST">
+                    <form action="/reply-to-reply/{{ reply_data.id }}" method="GET">
                         <button type="submit">リプをみる</button>
                     </form>
-                    <form action="/user/{{ reply_data.reply_user_id }}" method="POST">  <!--ユーザーの写真や名前を押したらsubmitする仕様にしたい-->
+                    <form action="/user/{{ reply_data.reply_user_id }}" method="GET">  <!--ユーザーの写真や名前を押したらsubmitする仕様にしたい-->
                         <button type="submit">このユーザーのプロフィールを見る</button>
                     </form>
                     <form action="/reply/{{ reply_data.id }}/push-like/{{ article_data.id }}" method="POST">
                         <button type="submit">いいね</button>
                     </form>
-                    <form action="/reply/{{ reply_data.id }}/likes" method="POST">
+                    <form action="/reply/{{ reply_data.id }}/likes" method="GET">
                         <button type="submit">いいねした人のidをみる</button>
                     </form>
                     {% if reply_data.reply_user_id == current_user_id %}

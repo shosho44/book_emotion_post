@@ -96,19 +96,19 @@ def load_user(user_id):
         return ''
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def show_main_page():
     some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
     current_user_id = current_user.user_id
     return render_template('index.html', some_data=some_data, current_user_id=current_user_id)
 
 
-@app.route('/signin', methods=['GET', 'POST'])
+@app.route('/signin', methods=['GET'])
 def signin():
     return render_template('signin.html')
 
 
-@app.route('/signin-confirm', methods=['GET', 'POST'])
+@app.route('/signin-confirm', methods=['POST'])
 def signin_confirm():
     user_id = request.form['user_id']
     password = request.form['password']
@@ -124,40 +124,9 @@ def signin_confirm():
         return redirect(url_for('show_main_page'))
 
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup', methods=['GET'])
 def signup():
     return render_template('signup.html')
-
-
-# 投稿した時の処理
-@app.route('/post-article', methods=['POST'])
-def post_article():
-    post_content = request.form['post-article']
-    book_title = request.form['book-title']
-    
-    user_id = current_user.user_id
-    
-    is_post_user_name = UserInformation.query.filter_by(user_id=user_id).first()
-    if is_post_user_name is None:
-        user_name = 'unknown_user'
-    else:
-        user_name = is_post_user_name.user_name
-    
-    some_data = PostArticle(user_id=user_id, user_name=user_name, book_title=book_title, post_content=post_content, created_at=time.time())
-    
-    db.session.add(some_data)
-    db.session.commit()
-    
-    return redirect(url_for('show_main_page'))
-
-
-@app.route('/passage/<string:article_id>/delete', methods=['GET', 'POST'])
-def delete_passage(article_id=''):
-    delete_passage_data = db.session.query(PostArticle).filter_by(id=article_id).first()
-    db.session.delete(delete_passage_data)
-    db.session.commit()
-    
-    return redirect(url_for('show_main_page'))  # user-profileから投稿削除した時はuser-profileを返したい
 
 
 @app.route('/signup-confirm', methods=['POST'])
@@ -182,7 +151,38 @@ def signup_confirm():
     return redirect(url_for('show_main_page'))
 
 
-@app.route('/user/<string:profile_user_id>', methods=['POST', 'GET'])
+# 投稿した時の処理
+@app.route('/post-article', methods=['POST'])
+def post_article():
+    post_content = request.form['post-article']
+    book_title = request.form['book-title']
+    
+    user_id = current_user.user_id
+    
+    is_post_user_name = UserInformation.query.filter_by(user_id=user_id).first()
+    if is_post_user_name is None:
+        user_name = 'unknown_user'
+    else:
+        user_name = is_post_user_name.user_name
+    
+    some_data = PostArticle(user_id=user_id, user_name=user_name, book_title=book_title, post_content=post_content, created_at=time.time())
+    
+    db.session.add(some_data)
+    db.session.commit()
+    
+    return redirect(url_for('show_main_page'))
+
+
+@app.route('/passage/<string:article_id>/delete', methods=['POST'])
+def delete_passage(article_id=''):
+    delete_passage_data = db.session.query(PostArticle).filter_by(id=article_id).first()
+    db.session.delete(delete_passage_data)
+    db.session.commit()
+    
+    return redirect(url_for('show_main_page'))  # user-profileから投稿削除した時はuser-profileを返したい
+
+
+@app.route('/user/<string:profile_user_id>', methods=['GET'])
 def user_profile(profile_user_id=''):
     user = UserInformation.query.filter_by(user_id=profile_user_id).first()
     user_name = user.user_name
@@ -208,7 +208,7 @@ def user_profile(profile_user_id=''):
 
 
 # profile_user_idがcurrent_user_idと違う場合アクセス権限がない旨を表示する
-@app.route('/user/<string:profile_user_id>/edit', methods=['POST', 'GET'])
+@app.route('/user/<string:profile_user_id>/edit', methods=['GET'])
 def edit_user_profile(profile_user_id=''):
     user_id = current_user.user_id
     user_name = current_user.user_name
@@ -219,7 +219,7 @@ def edit_user_profile(profile_user_id=''):
 
 
 # user_profileに関係している
-@app.route('/user/<string:profile_user_id>/update', methods=['POST', 'GET'])
+@app.route('/user/<string:profile_user_id>/update', methods=['POST'])
 @login_required
 def update_user_profile(profile_user_id=''):
     user_id = current_user.user_id
@@ -236,7 +236,7 @@ def update_user_profile(profile_user_id=''):
 
 
 # profile_user_idがcurrent_user_idと違う場合アクセス権限がない旨を表示する
-@app.route('/user/<string:profile_user_id>/edit/image/upload', methods=['GET', 'POST'])
+@app.route('/user/<string:profile_user_id>/edit/image/upload', methods=['POST'])
 @login_required
 def upload_user_image(profile_user_id=''):
     current_user_id = current_user.user_id
@@ -255,14 +255,14 @@ def upload_user_image(profile_user_id=''):
 
 
 # アクセス権限がない旨を表示する
-@app.route('/user/<string:profile_user_id>/edit/image', methods=['GET', 'POST'])
+@app.route('/user/<string:profile_user_id>/edit/image', methods=['GET'])
 def show_upload_user_image(profile_user_id=''):
     current_user_id = current_user.user_id
     
     return render_template('upload-user-image.html', user_id=current_user_id)
 
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['GET'])
 @login_required
 def logout_confirm():
     return render_template('logout-confirm.html')
@@ -289,7 +289,7 @@ def submit_reply(article_id=''):
     return redirect(url_for('reply_thread', article_id=article_id))
 
 
-@app.route('/reply/<string:article_id>', methods=['GET', 'POST'])
+@app.route('/reply/<string:article_id>', methods=['GET'])
 def reply_thread(article_id=''):
     current_user_id = current_user.user_id
     
@@ -331,7 +331,7 @@ def push_good_button(article_id=''):
     return redirect(url_for('show_main_page'))
 
 
-@app.route('/passage/<string:article_id>/likes', methods=['GET', 'POST'])
+@app.route('/passage/<string:article_id>/likes', methods=['GET'])
 def show_user_push_good(article_id=''):
     some_user_push_good_information = UserAndPushedGoodButtonArticle.query.filter_by(article_id=article_id).all()
     
@@ -367,7 +367,7 @@ def push_good_button_reply(reply_id='', article_id=''):
     return redirect(url_for('reply_thread', article_id=article_id))
 
 
-@app.route('/reply/<string:article_id>/likes', methods=['GET', 'POST'])
+@app.route('/reply/<string:article_id>/likes', methods=['GET'])
 def show_user_push_good_reply(article_id=''):
     some_user_push_good_information = UserAndPushedGoodButtonReply.query.filter_by(article_id=article_id).all()
     
@@ -386,7 +386,7 @@ def delete_article_from_user_profile_reply(reply_id='', article_id=''):
     return redirect(url_for('reply_thread', article_id=article_id))
 
 
-@app.route('/reply-to-reply/<string:id>', methods=['GET', 'POST'])
+@app.route('/reply-to-reply/<string:id>', methods=['GET'])
 def reply_to_reply(id=''):
     current_user_id = current_user.user_id
     

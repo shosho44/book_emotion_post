@@ -9,7 +9,7 @@
 <body>
     <div>
         <p>投稿ページ</p>
-        <form action="/user/{{ current_user_id }}" method="POST" enctype="multipart/form-data">  <!--current_user_idに値を入れる-->
+        <form action="/user/{{ current_user_id }}" method="GET" enctype="multipart/form-data">  <!--current_user_idに値を入れる-->
             <button type="submit">プロフィール</button>
         </form>
     </div>
@@ -33,16 +33,16 @@
                     <span>book title: {{ data.book_title }}</span>
                     <span>いいね数: {{ data.good_sum }}</span>
                 </div>
-                <form action="/reply/{{ data.id }}" method="POST">
+                <form action="/reply/{{ data.id }}" method="GET">
                     <button type="submit">リプをみる</button>
                 </form>
-                <form action="/user/{{ data.user_id }}" method="POST">  <!--ユーザーの写真や名前を押したらsubmitする仕様にしたい-->
+                <form action="/user/{{ data.user_id }}" method="GET">  <!--ユーザーの写真や名前を押したらsubmitする仕様にしたい-->
                     <button type="submit">このユーザーのプロフィールを見る</button>
                 </form>
                 <form action="/passage/{{ data.id }}/push-like" method="POST">
                     <button type="submit">いいね</button>
                 </form>
-                <form action="/passage/{{ data.id }}/likes" method="POST">
+                <form action="/passage/{{ data.id }}/likes" method="GET">
                     <button type="submit">いいねした人のidをみる</button>
                 </form>
                 {% if data.user_id == current_user_id %}
