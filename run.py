@@ -195,7 +195,7 @@ def user_profile(profile_user_id=''):
     else:
         is_current_user_equal_article_user = False
     
-    is_article_exist = PostArticle.query.filter_by(user_id=profile_user_id).all()
+    is_article_exist = PostArticle.query.filter_by(user_id=profile_user_id).order_by(PostArticle.created_at.desc()).all()
     
     if is_article_exist:
         some_article_data = is_article_exist
