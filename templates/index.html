@@ -4,46 +4,68 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/passage_and_reply.css">
+    <link rel="stylesheet" href="/static/css/destyle.css">
+    <script src="https://kit.fontawesome.com/8e5cd391ff.js" crossorigin="anonymous"></script>
     <title>Document</title>
 </head>
 <body>
-    <div>
-        <p>投稿ページ</p>
-        <a href="/user/{{ current_user_id }}">プロフィール</a>
-    </div>
-    <div>
-        <form action="/post-article" method="POST">
-            <span>本文</span>
-            <input type="text" name="post-article"/>
-            <span>本のタイトル</span>
-            <input type="text" name="book-title">
-            <input type="submit" value="投稿する"/>
-        </form>
-    </div>
-    <div>
-        {% for data in some_data %}
-            <div style="margin-bottom: 5px;background-color:cornsilk">
-                <div>
-                    <p>time_stamp: {{ data.created_at }}</p>
-                    <p>投稿内容: {{ data.post_content }}</p>
-                    <span>user name: {{ data.user_name }}</span><br>
-                    <span>user id: {{ data.user_id }}</span>
-                    <span>book title: {{ data.book_title }}</span>
-                    <span>いいね数: {{ data.good_sum }}</span>
+    <div class="wrapper d-f">
+        <div class="w-20per m-l-5per m-t-10 m-b-10">
+            <div class="m-a m-t-10 w-90per">
+                <a href="/">ホーム</a>
+            </div>
+            <div class="m-a m-t-10 w-90per">
+                <a href="/user/{{ current_user_id }}">プロフィール</a>
+            </div>
+        </div>
+        <div class="w-40per m-l-5per m-r-5per">
+            {% for data in some_data %}
+            <div class="b-r-10 passage-inner-wrapper__item m-t-10 m-b-10" style="background-color:cornsilk">
+                <div class="passage m-a p-b-15 p-t-15">
+                    <div class="w-b-b-a passage__item m-a-10 w-400">
+                        <p>{{ data.post_content }}</p>
+                    </div>
                 </div>
-                <a href="/reply/{{ data.id }}">リプライ</a>
-                <a href="/user/{{ data.user_id }}">このユーザーのプロフィールを見る</a>
-                <form action="/passage/{{ data.id }}/push-like" method="POST">
-                    <button type="submit">いいね</button>
-                </form>
-                <a href="/passage/{{ data.id }}/likes">いいねした人のidをみる</a>
-                {% if data.user_id == current_user_id %}
-                    <form action="/passage/{{ data.id }}/delete" method="POST">
-                        <button type="submit">削除する</button>
-                    </form>
-                {% endif %}
+                <div class="w-b-b-a m-a w-400">
+                    <span><i class="fas fa-book-open m-r-5"></i>{{ data.book_title }}</span>
+                </div>
+                <div class="d-f m-a w-400">
+                    <span class="b-b-1-s-b w-400 m-t-5 m-b-5"></span>
+                </div>
+                <div class="d-f m-a p-b-5 w-400 w-b-b-a">
+                    <div class="w-40per">
+                        <a href="/user/{{ data.user_id }}">{{ data.user_name }}</a>
+                    </div>
+                    <div class="d-f w-28per">
+                        <form action="/passage/{{ data.id }}/push-like" method="POST">
+                            <button type="submit"><i class="far fa-heart m-r-5"></i></button>
+                        </form>
+                        <a href="/passage/{{ data.id }}/likes">{{ data.good_sum }}</a>
+                    </div>
+                    <div class="w-16per">
+                        <a href="/reply/{{ data.id }}">コメント</a>
+                    </div>
+                    <div class="t-a-r w-16per">
+                        {% if data.user_id == current_user_id %}
+                        <form action="/passage/{{ data.id }}/delete" method="POST">
+                            <button type="submit"><i class="fas fa-trash"></i></button>
+                        </form>
+                    {% endif %}
+                    </div>
+                </div>
             </div>
         {% endfor %}
+        </div>
+        <div class="d-b post-wrapper m-r-5per m-t-10 m-b-10 w-20per">
+            <form action="/post-article" method="POST" class="w-100per">
+                <div class="m-a  w-90per">
+                    <textarea type="text" placeholder="感動した文章" name="post-article" class="post-input h-100 m-t-10 p-b-5 p-l-5 p-t-5 w-b-b-a w-100per"></textarea>
+                    <input type="text" placeholder="本のタイトル" name="book-title" class="post-input m-t-10 p-b-5 p-l-5 p-t-5 w-100per">
+                    <input type="submit" value="投稿する" class="m-t-10">
+                </div>
+            </form>
+        </div>
     </div>
 </body>
 </html>

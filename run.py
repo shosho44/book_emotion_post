@@ -7,7 +7,7 @@ from flask_login import current_user, login_user, logout_user, login_required, U
 import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__, static_folder='img')
+app = Flask(__name__, static_folder='static')
 
 # データベースの設定
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db'  # sqliteを使っている
@@ -15,7 +15,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['APPLICATION_ROOT'] = '/'
 db = SQLAlchemy(app)
 
-with open('img/sample_image_human.png', mode='rb') as f:
+with open('static/img/sample_image_human.png', mode='rb') as f:
     default_user_image_base64 = base64.b64encode(f.read())
 
 
@@ -158,6 +158,9 @@ def post_article():
     book_title = request.form['book-title']
     
     user_id = current_user.user_id
+    
+    if book_title == '':
+        book_title = '不明'
     
     is_post_user_name = UserInformation.query.filter_by(user_id=user_id).first()
     if is_post_user_name is None:
