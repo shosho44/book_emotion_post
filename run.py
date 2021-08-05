@@ -310,7 +310,6 @@ def reply_thread(article_id=''):
 @app.route('/passage/<string:article_id>/push-like', methods=['POST'])
 def push_good_button(article_id=''):
     article = PostArticle.query.filter_by(id=article_id).first()
-    
     user_id_push_good_button = current_user.user_id
     
     is_user_already_push_good_button = UserAndPushedGoodButtonArticle.query.filter_by(
