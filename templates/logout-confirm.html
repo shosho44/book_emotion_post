@@ -4,14 +4,28 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ログアウト確認</title>
+    <link rel="stylesheet" href="/static/css/logout.css">
+    <link rel="stylesheet" href="/static/css/destyle.css">
+    <script src="https://kit.fontawesome.com/8e5cd391ff.js" crossorigin="anonymous"></script>
+    <title>ブクエモ！</title>
 </head>
 <body>
-    <div class="">
-        <h1>ログアウトしますか？</h1>
-        <a href="/run-logout">はい</a>
-        <a href="/user/{{ user_id }}">いいえ</a>
+    <div class="b-r-10 d-f f-center h-100v w-100v">  <!--縦も真ん中にする-->
+        <div class="b-r-10 h-250 w-250" style="background-color: burlywood;">
+            <div class="d-f f-center h-50per f-center">
+                <h1 class="t-a-c">ログアウトしますか？</h1>
+            </div>
+            <div class="d-f h-40per f-center" style="justify-content: space-around;">
+                <div class="b-r-5 w-45per">
+                    <form action="/run-logout" method="POST">
+                        <button class="b-r-10 p-b-10per p-t-10per t-a-c w-100per" style="background-color: crimson;" type="submit">はい</button>
+                    </form>
+                </div>
+                <div class="b-r-5 w-45per">
+                    <a href="/user/{{ user_id }}"><p class="b-r-10 p-b-10per p-t-10per t-a-c" style="background-color: chartreuse;">いいえ</p></a>
+                </div>
+            </div>
+        </div>
     </div>
-
 </body>
 </html>
