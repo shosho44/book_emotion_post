@@ -4,26 +4,38 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ログイン</title>
+    <link rel="stylesheet" href="/static/css/destyle.css">
+    <link rel="stylesheet" href="/static/css/signin-and-signup.css">
+    <title>ブクエモ！</title>
 </head>
 <body>
-    <div>
-        <h1>
-            <span>心揺さぶる文章がここにある</span>
-        </h1>
-        <div>
-            <form action="signin-confirm" method="POST" enctype="multipart/form-data">
-                <input autocapitalize="none" autocomplete="on" autocorrect="off" spellcheck="false" type="text" name="user_id" placeholder="user_id" dir="auto">
-                <input autocapitalize="none" autocomplete="on" autocorrect="off" spellcheck="false" type="password" name="password" placeholder="パスワード" dir="auto">
-                <button type="submit">ログイン</button>
-                <div>
-                    <a href="signup">アカウントを作成する</a>
-                    <span>|</span>
-                    <a href="#">パスワードを忘れた</a>
+    <div class="d-f d-f-center h-100v">
+        <div class="b-r-10 h-400 w-300" style="background-color:cyan;">
+            <div class="m-20per-a">
+                <div class="m-b-30 t-a-c">
+                    <h1 class="f-size-36 f-w-700">ブクエモ！</h1>
+                    <p class="f-size-16">心揺さぶる文章がここにある</p>
                 </div>
-            </form>
+                <form action="signin-confirm" method="POST" enctype="multipart/form-data">
+                    <div class="d-f d-f-center">
+                        <div class="w-80per">
+                            <input class="b-r-5 h-30 m-b-5 p-l-10 w-100per" style="background-color:rgb(235, 235, 235);" autocapitalize="none" autocomplete="on" autocorrect="off" spellcheck="false" type="text" name="user_id" placeholder="user_id" dir="auto">
+                            <input class="b-r-5 h-30 m-b-5 p-l-10 w-100per" style="background-color:rgb(235, 235, 235);" autocapitalize="none" autocomplete="on" autocorrect="off" spellcheck="false" type="password" name="password" placeholder="パスワード" dir="auto">
+                        </div>
+                    </div>
+                    <div class="d-f d-f-center m-t-10">
+                        <div class="b-r-5 h-30 w-80per" style="background-color:darkgoldenrod;">
+                            <button class="border-box t-a-c h-30 w-100per" type="submit">ログイン</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="t-a-c m-t-10">
+                    <a class="f-size-12" href="signup">アカウントを作成する</a>
+                    <span>|</span>
+                    <a class="f-size-12" href="#">パスワードを忘れた</a>
+                </div>
+            </div>
         </div>
     </div>
 </body>
 </html>
-<!--ここの背景にみんなの投稿を並べて配置したらオシャンっぽい-->
