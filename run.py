@@ -98,6 +98,9 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET'])
 def show_main_page():
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
     some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
     current_user_id = current_user.user_id
     return render_template('index.html', some_data=some_data, current_user_id=current_user_id)
@@ -187,6 +190,9 @@ def delete_passage(article_id=''):
 
 @app.route('/user/<string:profile_user_id>', methods=['GET'])
 def user_profile(profile_user_id=''):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
     user = UserInformation.query.filter_by(user_id=profile_user_id).first()
     user_name = user.user_name
     self_introduction = user.self_introduction
@@ -213,6 +219,9 @@ def user_profile(profile_user_id=''):
 # profile_user_idがcurrent_user_idと違う場合アクセス権限がない旨を表示する
 @app.route('/user/<string:profile_user_id>/edit', methods=['GET'])
 def edit_user_profile(profile_user_id=''):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
     user_id = current_user.user_id
     user_name = current_user.user_name
     self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
@@ -260,14 +269,19 @@ def upload_user_image(profile_user_id=''):
 # アクセス権限がない旨を表示する
 @app.route('/user/<string:profile_user_id>/edit/image', methods=['GET'])
 def show_upload_user_image(profile_user_id=''):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
     current_user_id = current_user.user_id
     
     return render_template('upload-user-image.html', user_id=current_user_id)
 
 
 @app.route('/logout', methods=['GET'])
-@login_required
 def logout_confirm():
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
     user_id = current_user.user_id
     return render_template('logout-confirm.html', user_id=user_id)
 
@@ -295,6 +309,9 @@ def submit_reply(article_id=''):
 
 @app.route('/reply/<string:article_id>', methods=['GET'])
 def reply_thread(article_id=''):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
     current_user_id = current_user.user_id
     
     article_data = PostArticle.query.filter_by(id=article_id).first()
@@ -336,6 +353,9 @@ def push_good_button(article_id=''):
 
 @app.route('/passage/<string:article_id>/likes', methods=['GET'])
 def show_user_push_good(article_id=''):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
     some_user_push_good_information = UserAndPushedGoodButtonArticle.query.filter_by(article_id=article_id).all()
     
     return render_template('show-user-id-push-good.html', some_user_push_good_information=some_user_push_good_information)
@@ -372,6 +392,9 @@ def push_good_button_reply(reply_id='', article_id=''):
 
 @app.route('/reply/<string:article_id>/likes', methods=['GET'])
 def show_user_push_good_reply(article_id=''):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
     some_user_push_good_information = UserAndPushedGoodButtonReply.query.filter_by(article_id=article_id).all()
     
     return render_template('show-user-id-push-good-reply.html', some_user_push_good_information=some_user_push_good_information)
@@ -391,6 +414,9 @@ def delete_article_from_user_profile_reply(reply_id='', article_id=''):
 
 @app.route('/reply-to-reply/<string:id>', methods=['GET'])
 def reply_to_reply(id=''):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
     current_user_id = current_user.user_id
     
     article_data = ReplyInformation.query.filter_by(id=id).first()
