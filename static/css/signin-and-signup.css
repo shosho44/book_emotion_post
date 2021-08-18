@@ -19,10 +19,18 @@
     transition: 0.3s;
 }
 
+.bg-c-235-235-235{
+    background-color:rgb(235, 235, 235);
+}
+
 .border-box {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
+}
+
+.c-110-110-110-hover:hover {
+    color:rgb(110, 110, 110)
 }
 
 .d-f {

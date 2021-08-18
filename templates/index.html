@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="/static/css/passage_and_reply.css">
     <link rel="stylesheet" href="/static/css/destyle.css">
     <script src="https://kit.fontawesome.com/8e5cd391ff.js" crossorigin="anonymous"></script>
-    <title>Document</title>
+    <title>ブクエモ！</title>
 </head>
 <body>
     <div class="wrapper d-f">
         {% include 'left-column.html' %}
         <div class="w-40per m-l-5per m-r-5per">
             {% for data in some_data %}
-            <div class="b-r-10 passage-inner-wrapper__item m-t-10 m-b-10" style="background-color:cornsilk">
+            <div class="b-g-c-255-248-220 b-r-10 passage-inner-wrapper__item m-t-10 m-b-10">
                 <div class="passage m-a p-b-15 p-t-15">
                     <div class="w-b-b-a passage__item m-a-10 w-400">
                         <p>{{ data.post_content }}</p>
@@ -28,16 +28,16 @@
                 </div>
                 <div class="d-f m-a p-b-5 w-400 w-b-b-a">
                     <div class="w-40per">
-                        <a href="/user/{{ data.user_id }}">{{ data.user_name }}</a>
+                        <a class="c-110-110-110-hover" href="/user/{{ data.user_id }}">{{ data.user_name }}</a>
                     </div>
                     <div class="d-f w-28per">
                         <form action="/passage/{{ data.id }}/push-like" method="POST">
                             <button type="submit"><i class="far fa-heart m-r-5"></i></button>
                         </form>
-                        <a href="/passage/{{ data.id }}/likes">{{ data.good_sum }}</a>
+                        <a class="c-110-110-110-hover" href="/passage/{{ data.id }}/likes">{{ data.good_sum }}</a>
                     </div>
                     <div class="w-16per">
-                        <a href="/reply/{{ data.id }}">コメント</a>
+                        <a class="c-110-110-110-hover" href="/reply/{{ data.id }}">コメント</a>
                     </div>
                     <div class="t-a-r w-16per">
                         {% if data.user_id == current_user_id %}

@@ -2,6 +2,22 @@
     border-radius: 10px;
 }
 
+.bg-c-104-104-104 {
+    background-color: rgb(104, 104, 104);
+}
+
+.bg-c-150-150-150 {
+    background-color: rgb(150, 150, 150);
+}
+
+.bg-c-224-224-224{
+    background-color: rgb(224, 224, 224);
+}
+
+.bg-c-235-235-235{
+    background-color:rgb(235, 235, 235);
+}
+
 .d-f {
     display: flex;
 }
