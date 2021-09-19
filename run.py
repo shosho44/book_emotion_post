@@ -2,83 +2,11 @@
 import base64
 import time
 from flask import Flask, render_template, url_for, redirect, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import current_user, login_user, logout_user, login_required, UserMixin
+from flask_login import current_user, login_user, logout_user, login_required
 import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__, static_folder='static')
-
-# データベースの設定
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db'  # sqliteを使っている
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['APPLICATION_ROOT'] = '/'
-db = SQLAlchemy(app)
-
-with open('static/img/sample_image_human.png', mode='rb') as f:
-    default_user_image_base64 = base64.b64encode(f.read())
-
-
-class PostArticle(db.Model):
-    
-    __tablename__ = 'articles'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(128), nullable=False)
-    user_name = db.Column(db.String(128), nullable=False)
-    book_title = db.Column(db.String(128), nullable=False, default='不明')
-    post_content = db.Column(db.String(128), nullable=False)
-    created_at = db.Column(db.Float, nullable=False)
-    good_sum = db.Column(db.Integer, nullable=False, default=0)
-
-
-class ReplyInformation(db.Model):
-    
-    __tablename__ = 'articlereply'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    article_id = db.Column(db.String(128), nullable=True)  # 投稿に対してのリプ
-    reply_to_reply_article_id = db.Column(db.String(128), nullable=True)  # リプに対してのリプ
-    reply_user_id = db.Column(db.String(128), nullable=False)
-    reply_user_name = db.Column(db.String(128), nullable=False)
-    reply_content = db.Column(db.String(128), nullable=False)
-    created_at = db.Column(db.Float, nullable=False)
-    good_sum = db.Column(db.Integer, nullable=False, default=0)
-
-
-class UserInformation(UserMixin, db.Model):
-    
-    __tablename__ = 'users'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(128), nullable=False)
-    password = db.Column(db.String(128), nullable=False)
-    user_name = db.Column(db.String(128), nullable=False)
-    email_address = db.Column(db.String(128), nullable=False)
-    self_introduction = db.Column(db.String(128), nullable=False, default='')
-    user_image = db.Column(db.LargeBinary, nullable=False, default=default_user_image_base64)
-
-
-class UserAndPushedGoodButtonArticle(db.Model):
-    
-    __tablename__ = 'user_and_pushed_good_button_article'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id_push_good_article = db.Column(db.String(128), nullable=False)
-    article_id = db.Column(db.Integer, nullable=False)
-
-
-class UserAndPushedGoodButtonReply(db.Model):
-    
-    __tablename__ = 'user_and_pushed_good_button_reply'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id_push_good_reply = db.Column(db.String(128), nullable=False)
-    article_id = db.Column(db.Integer, nullable=False)  # ReplyInformationのidを入れる
-
-
-app.secret_key = 'secret key'  # セッションを有効にするために必要
-app.config['SECRET_KEY'] = 'secret'
+from config import app
 
 login_manager = flask_login.LoginManager()
 login_manager.login_view = 'signin'  # 参考URL:https://teratail.com/questions/167338
@@ -89,15 +17,16 @@ login_manager.init_app(app)
 # 認証ユーザの呼び出し方を定義している
 @login_manager.user_loader
 def load_user(user_id):
-    is_user_information_exist = UserInformation.query.get(user_id)
+    is_user_information_exist = UserLoginInformation.query.get(user_id)
     if is_user_information_exist:
         return is_user_information_exist
     else:
-        return ''
+        return None
 
 
 @app.route('/', methods=['GET'])
 def show_main_page():
+    print('\n\n', current_user)
     if current_user.is_authenticated is False:
         return redirect(url_for('signin'))
     
@@ -223,7 +152,7 @@ def edit_user_profile(profile_user_id=''):
         return redirect(url_for('signin'))
     
     user_id = current_user.user_id
-    user_name = current_user.user_name
+    user_name = current_user.user_name  # 直す必要あり
     self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
     user_image = UserInformation.query.filter_by(user_id=user_id).first().user_image.decode()
     
