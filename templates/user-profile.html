@@ -25,13 +25,13 @@
                             {% endif %}
                         </div>
                         <div>
-                            <span class="f-s-30 f-w-700">{{ user_name }}</span>
+                            <span class="f-s-30 f-w-700">{{ user.user_name }}</span>
                         </div>
                         <div>
-                            <span>@{{ user_id }}</span>
+                            <span>@{{ user.user_id }}</span>
                         </div>
                         <div class="d-f w-400 w-b-b-a">
-                            <span>{{ self_introduction }}</span>
+                            <span>{{ user.self_introduction }}</span>
                         </div>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="d-f m-a p-b-5 w-400 w-b-b-a">
                     <div class="w-40per">
-                        <a class="c-110-110-110-hover" href="/user/{{ data.user_id }}">{{ data.user_name }}</a>
+                        <a class="c-110-110-110-hover" href="/user/{{ data.user_id }}">{{ user.user_name }}</a>
                     </div>
                     <div class="d-f w-28per">
                         <form action="/passage/{{ data.id }}/push-like" method="POST">

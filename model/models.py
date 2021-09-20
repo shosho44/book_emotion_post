@@ -17,7 +17,7 @@ class Passages(DB.Model):
     passage_id = DB.Column(DB.Integer, primary_key=True)
     user_id = DB.Column(DB.String(128), DB.ForeignKey('users.user_id'), nullable=False)
     book_title = DB.Column(DB.String(128), nullable=False, default='不明')
-    post_content = DB.Column(DB.String(128), nullable=False)
+    passage_content = DB.Column(DB.String(128), nullable=False)
     created_at = DB.Column(DB.DateTime, nullable=False)
 
 
@@ -37,6 +37,9 @@ class UserLoginInformation(UserMixin, DB.Model):
     
     id = DB.Column(DB.Integer, primary_key=True)
     user_id = DB.Column(DB.String(128), DB.ForeignKey('users.user_id'), nullable=False)
+    
+    def get_id(self):
+        return self.user_id
 
 
 class Users(DB.Model):
