@@ -52,6 +52,7 @@ class Users(DB.Model):
     email_address = DB.Column(DB.String(128), nullable=False)
     self_introduction = DB.Column(DB.String(128), nullable=False, default='')
     user_image = DB.Column(DB.LargeBinary, nullable=False, default=default_user_image_base64)
+    created_at = DB.Column(DB.DateTime, nullable=False)
 
 
 class PassageLikes(DB.Model):
@@ -61,3 +62,4 @@ class PassageLikes(DB.Model):
     like_id = DB.Column(DB.Integer, primary_key=True)
     user_id = DB.Column(DB.String(128), DB.ForeignKey('users.user_id'), nullable=False)
     passage_id = DB.Column(DB.Integer, DB.ForeignKey('passages.passage_id'), nullable=False)
+    created_at = DB.Column(DB.DateTime, nullable=False)
