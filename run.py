@@ -29,16 +29,23 @@ def show_main_page():
     if current_user.is_authenticated is False:
         return redirect(url_for('signin'))
     
-    passages_information_table = DB.session.query(models.Passages) \
-                                                  .filter(models.Passages.user_id == models.Users.user_id) \
-                                                  .filter(models.Passages.passage_id == models.PostIDs.passage_id)
+    passages_information_table = DB.session.query(models.Passages,
+                                                  models.Users,
+                                                  models.PostIDs
+                                                  ).join(
+                                                      models.Users,
+                                                      models.Passages.user_id == models.Users.user_id
+                                                      ).join(
+                                                          models.PostIDs,
+                                                          models.Passages.passage_id == models.PostIDs.passage_id
+                                                      )
     
-    passages_information_list =  passages_information_table.order_by(models.Passages.created_at.desc()).all()
+    passages_information_list = passages_information_table.order_by(models.Passages.created_at.desc()).all()
     current_user_id = current_user.user_id
     
     return render_template('main-page.html',
                            passages_information_list=passages_information_list,
-                           user_id=current_user_id
+                           current_user_id=current_user_id
                            )
 
 
@@ -199,8 +206,15 @@ def user_profile(user_id=''):
     is_current_user_equal_profile_user = False
     if current_user_id == user_id:
         is_current_user_equal_profile_user = True
-        
-    passages_data_list = models.Passages.query.filter_by(user_id=user_id).order_by(models.Passages.created_at.desc()).all()
+    
+    passages_data_list = DB.session.query(models.Passages,
+                                          models.PostIDs
+                                          ).join(
+                                              models.PostIDs,
+                                              models.Passages.passage_id == models.PostIDs.passage_id
+                                              ).filter(models.Passages.user_id==user_id).order_by(models.Passages.created_at.desc()).all()
+                                    
+    # passages_data_list = models.Passages.query.filter_by(user_id=user_id).order_by(models.Passages.created_at.desc()).all()
     if passages_data_list is None:
         passages_data_list = []
     
@@ -224,7 +238,7 @@ def edit_user_profile(user_id=''):
     user = models.Users.query.filter_by(user_id=user_id).first()
     user_image = user.user_image.decode()
     return render_template('edit-user-profile.html',
-                           user_id=user_id,
+                           current_user_id=user_id,
                            user_image=user_image
                            )
 
@@ -295,31 +309,117 @@ def run_logout():
     return redirect(url_for('signin'))
 
 
-"""
 # 実装途中
-@app.route('/posts/<int:post_id>', methods=['GET'])
+# parentのデータがほしい
+# childのデータリストがほしい
+# html側でpassageかcommentかの場合分けしてあげる。そのためにflagを渡す
+@app.route('/comment/<int:post_id>', methods=['GET'])
 def show_posts(post_id):
     passage_id = models.PostIDs.query.filter_by(post_id=post_id).first().passage_id
-    passage_data = models.Passages.query.filter_by(passage_id=passage_id).first()
+    parent_post_id = post_id
     
-    child_data_list = DB.session.query(models.Comments) \
-                                .filter(models.Comments.comment_id == models.PostIDs.comment_id) \
-                                .filter(models.PostIDs.post_id == models.PassageCommentRelations.child_id) \
-                                .filter_by(parent_id = passage_id).all()
-    
+    child_data_table = DB.session.query(models.Comments,
+                                        models.PassageCommentRelations,
+                                        models.PostIDs,
+                                        models.Users
+                                        ).join(
+                                            models.PassageCommentRelations,
+                                            models.Comments.comment_id == models.PassageCommentRelations.child_id
+                                            ).join(
+                                                models.PostIDs,
+                                                models.Comments.comment_id == models.PostIDs.comment_id
+                                            ).join(
+                                                models.Users,
+                                                models.Comments.user_id == models.Users.user_id
+                                                )
+    child_data_list = child_data_table.filter(models.PassageCommentRelations.parent_id == parent_post_id).order_by(models.Comments.created_at.desc()).all()
+
     if passage_id == -1:
-        pass
-        # comment_id = models.PostIDs.query.filter_by(post_id=post_id).first().comment_id
-        # comment_data = models.Comments.query.filter_by(comment_id=comment_id).first()
+        parent_content = parent_user_name = parent_user_id = ''
+        book_title_needed_flag = False
+        
+        comment_id = models.PostIDs.query.filter_by(post_id=post_id).first().comment_id
+        
+        comment_data = DB.session.query(models.Comments,
+                                        models.Users
+                                        ).join(
+                                            models.Users,
+                                            models.Comments.user_id == models.Users.user_id
+                                            ).filter(models.Comments.comment_id==comment_id).first()
+        
+        parent_content = comment_data.Comments.comment_content
+        parent_user_id = comment_data.Users.user_id
+        parent_user_name = comment_data.Users.user_name
+        
+        return render_template('comment-thread.html',
+                               parent_content=parent_content,
+                               child_data_list=child_data_list,
+                               book_title_needed_flag=book_title_needed_flag,
+                               parent_user_name=parent_user_name,
+                               parent_user_id=parent_user_id,
+                               current_user_id=current_user.user_id,
+                               parent_post_id=parent_post_id
+                               )  # good_sumに変わるいいね数を算出する処理を行うlike_sumという変数に入れるTodo
+        
+    passage_data = DB.session.query(models.Passages,
+                                    models.Users
+                                    ).join(
+                                        models.Users,
+                                        models.Passages.user_id == models.Users.user_id
+                                        ).filter(models.Passages.passage_id==passage_id).first()
+
+    parent_content = passage_data.Passages.passage_content
+    book_title = passage_data.Passages.book_title
+    book_title_needed_flag = True
+    parent_user_name = passage_data.Users.user_name
+    parent_user_id = passage_data.Passages.user_id
+    passage_id = passage_data.Passages.passage_id
     
-    return render_template('posts-thread.html',
-                           passage_data=passage_data,
+    return render_template('comment-thread.html',
+                           parent_content=parent_content,
                            child_data_list=child_data_list,
-                           current_user_id = current_user.user_id
-                           )  #  good_sumに変わるいいね数を算出する処理を行うlike_sumという変数に入れるTodo
-"""
+                           book_title=book_title,
+                           book_title_needed_flag=book_title_needed_flag,
+                           parent_user_name=parent_user_name,
+                           parent_user_id=parent_user_id,
+                           current_user_id=current_user.user_id,
+                           parent_post_id=parent_post_id
+                           )  # good_sumに変わるいいね数を算出する処理を行うlike_sumという変数に入れるTodo
+
+
+@app.route('/submit-comment/<int:parent_post_id>', methods=['POST'])
+def post_comment(parent_post_id):
+    comment_content = request.form['comment_content']
+    
+    insert_comment_data = models.Comments(
+        user_id=current_user.user_id,
+        comment_content=comment_content,
+        created_at=datetime.datetime.now()
+    )
+    
+    DB.session.add(insert_comment_data)
+    DB.session.commit()
+    
+    insert_post_ID_data = models.PostIDs(comment_id=insert_comment_data.comment_id)
+    
+    DB.session.add(insert_post_ID_data)
+    DB.session.commit()
+    
+    insert_comment_relation_data = models.PassageCommentRelations(
+        parent_id=parent_post_id,
+        child_id=insert_comment_data.comment_id
+    )
+    
+    DB.session.add(insert_comment_relation_data)
+    DB.session.commit()
+    
+    return redirect(url_for('show_posts',
+                                post_id=parent_post_id
+                                )
+                        )
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
+    logout_user()
     DB.drop_all()
     DB.create_all()
