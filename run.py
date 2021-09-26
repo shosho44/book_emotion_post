@@ -43,8 +43,15 @@ def show_main_page():
     passages_information_list = passages_information_table.order_by(models.Passages.created_at.desc()).all()
     current_user_id = current_user.user_id
     
+    passage_like_sum_list = []
+    
+    for passages_information in passages_information_list:
+        passage_like_sum = len(models.PassageLikes.query.filter_by(passage_id=passages_information.Passages.passage_id).all())
+        
+        passage_like_sum_list.append(passage_like_sum)
+    
     return render_template('main-page.html',
-                           passages_information_list=passages_information_list,
+                           ziped_list = zip(passages_information_list, passage_like_sum_list),
                            current_user_id=current_user_id
                            )
 
@@ -135,7 +142,6 @@ def post_passage():
     DB.session.add(insert_passage_coments_relations_data)
     DB.session.commit()
     
-    print("\n\ninsert_passage_data: ", insert_passage_data.passage_id)
     return redirect(url_for('show_main_page'))
 
 
@@ -145,7 +151,6 @@ def delete_passage(passage_id=''):
     
     models.PassageCommentRelations.query.filter_by(parent_id=post_id).delete()
     models.PassageCommentRelations.query.filter_by(child_id=post_id).delete()
-    models.PassageLikes.query.filter_by(passage_id=passage_id).delete()
     models.PassageLikes.query.filter_by(passage_id=passage_id).delete()
     
     delete_passage_data = DB.session.query(models.Passages).filter_by(passage_id=passage_id).first()
@@ -158,13 +163,14 @@ def delete_passage(passage_id=''):
     return redirect(url_for('show_main_page'))  # user-profileから投稿削除した時はuser-profileを返したいtodo
 
 
-@app.route('/passage/<string:passage_id>/push-like', methods=['POST'])
-def push_good_button(passage_id=''):
+@app.route('/passage/<int:passage_id>/push-like/<int:parent_post_id>', methods=['POST'])
+@app.route('/passage/<int:passage_id>/push-like', methods=['POST'])
+def push_like_button_passage(passage_id, parent_post_id=-1):
     current_user_id = current_user.user_id
     
     has_user_already_push_liked = models.PassageLikes.query.filter_by(passage_id=passage_id, user_id=current_user_id).first()
     
-    if has_user_already_push_liked:
+    if has_user_already_push_liked is None:
         insert_data = models.PassageLikes(
             user_id=current_user_id,
             passage_id=passage_id,
@@ -175,8 +181,15 @@ def push_good_button(passage_id=''):
         DB.session.commit()
     else:
         delete_data = has_user_already_push_liked
-        DB.session.add(delete_data)
+        DB.session.delete(delete_data)
         DB.session.commit()
+    
+    if parent_post_id != -1:
+        return redirect(url_for(
+            'show_posts',
+            post_id=parent_post_id
+            )
+                        )
     
     return redirect(url_for('show_main_page'))
 
@@ -194,7 +207,7 @@ def show_user_push_good(passage_id=''):
 
 
 @app.route('/user/<string:user_id>', methods=['GET'])
-def user_profile(user_id=''):
+def show_user_profile(user_id=''):
     if current_user.is_authenticated is False:
         return redirect(url_for('signin'))
     
@@ -207,22 +220,29 @@ def user_profile(user_id=''):
     if current_user_id == user_id:
         is_current_user_equal_profile_user = True
     
-    passages_data_list = DB.session.query(models.Passages,
+    passages_information_list = DB.session.query(models.Passages,
                                           models.PostIDs
                                           ).join(
                                               models.PostIDs,
                                               models.Passages.passage_id == models.PostIDs.passage_id
                                               ).filter(models.Passages.user_id==user_id).order_by(models.Passages.created_at.desc()).all()
-                                    
-    # passages_data_list = models.Passages.query.filter_by(user_id=user_id).order_by(models.Passages.created_at.desc()).all()
-    if passages_data_list is None:
-        passages_data_list = []
+
+    if passages_information_list is None:
+        passages_information_list = []
     
+    passage_like_sum_list = []
+    
+    for passages_information in passages_information_list:
+        passage_like_sum = len(models.PassageLikes.query.filter_by(passage_id=passages_information.Passages.passage_id).all())
+        
+        passage_like_sum_list.append(passage_like_sum)
+        
     return render_template('user-profile.html',
                            user=user,
+                           current_user_id=current_user.user_id,
                            user_image=user_image,
                            is_current_user_equal_profile_user=is_current_user_equal_profile_user,
-                           passages_data_list=passages_data_list
+                           ziped_passages_and_like_sum_data_list=zip(passages_information_list, passage_like_sum_list)
                            )  #  good_sumに変わるいいね数を算出する処理を行うlike_sumという変数に入れるTodo
 
 
@@ -230,7 +250,7 @@ def user_profile(user_id=''):
 def edit_user_profile(user_id=''):
     current_user_id = current_user.user_id
     if current_user_id != user_id:
-        return redirect(url_for('user_profile',
+        return redirect(url_for('show_user_profile',
                                 user_id=user_id
                                 )
                         )
@@ -254,7 +274,7 @@ def update_user_profile(user_id=''):
     
     DB.session.commit()
     
-    return redirect(url_for('user_profile',
+    return redirect(url_for('show_user_profile',
                             user_id=user_id
                             )
                     )
@@ -273,7 +293,7 @@ def upload_user_image(user_id=''):
     
     DB.session.commit()
     
-    return redirect(url_for('user_profile',
+    return redirect(url_for('show_user_profile',
                             user_id=user_id
                             )
                     )
@@ -283,7 +303,7 @@ def upload_user_image(user_id=''):
 def show_edit_user_image(user_id=''):
     current_user_id = current_user.user_id
     if user_id != current_user_id:
-        return redirect(url_for('user_profile',
+        return redirect(url_for('show_user_profile',
                                 user_id=user_id
                                 )
                         )
@@ -305,14 +325,10 @@ def show_logout():
 @app.route('/run-logout', methods=['POST'])
 def run_logout():
     logout_user()
-    
+    print(current_user.is_authenticated)
     return redirect(url_for('signin'))
 
 
-# 実装途中
-# parentのデータがほしい
-# childのデータリストがほしい
-# html側でpassageかcommentかの場合分けしてあげる。そのためにflagを渡す
 @app.route('/comment/<int:post_id>', methods=['GET'])
 def show_posts(post_id):
     passage_id = models.PostIDs.query.filter_by(post_id=post_id).first().passage_id
@@ -323,20 +339,26 @@ def show_posts(post_id):
                                         models.PostIDs,
                                         models.Users
                                         ).join(
-                                            models.PassageCommentRelations,
-                                            models.Comments.comment_id == models.PassageCommentRelations.child_id
+                                            models.PostIDs,
+                                            models.Comments.comment_id == models.PostIDs.comment_id
                                             ).join(
-                                                models.PostIDs,
-                                                models.Comments.comment_id == models.PostIDs.comment_id
+                                                models.PassageCommentRelations,
+                                                models.PostIDs.post_id == models.PassageCommentRelations.child_id
                                             ).join(
                                                 models.Users,
                                                 models.Comments.user_id == models.Users.user_id
                                                 )
     child_data_list = child_data_table.filter(models.PassageCommentRelations.parent_id == parent_post_id).order_by(models.Comments.created_at.desc()).all()
-
+    
+    child_like_sum_list = []
+    
+    for child_data in child_data_list:
+        comment_like_sum = len(models.CommentLikes.query.filter_by(comment_id=child_data.Comments.comment_id).all())
+        child_like_sum_list.append(comment_like_sum)
+        
     if passage_id == -1:
         parent_content = parent_user_name = parent_user_id = ''
-        book_title_needed_flag = False
+        is_passage = False
         
         comment_id = models.PostIDs.query.filter_by(post_id=post_id).first().comment_id
         
@@ -350,16 +372,19 @@ def show_posts(post_id):
         parent_content = comment_data.Comments.comment_content
         parent_user_id = comment_data.Users.user_id
         parent_user_name = comment_data.Users.user_name
+        parent_like_sum = len(models.CommentLikes.query.filter(models.CommentLikes.comment_id==comment_id).all())
+        
         
         return render_template('comment-thread.html',
                                parent_content=parent_content,
-                               child_data_list=child_data_list,
-                               book_title_needed_flag=book_title_needed_flag,
+                               child_data_and_like_sum_list=zip(child_data_list, child_like_sum_list),
+                               is_passage=is_passage,
                                parent_user_name=parent_user_name,
                                parent_user_id=parent_user_id,
                                current_user_id=current_user.user_id,
-                               parent_post_id=parent_post_id
-                               )  # good_sumに変わるいいね数を算出する処理を行うlike_sumという変数に入れるTodo
+                               parent_post_id=parent_post_id,
+                               parent_like_sum=parent_like_sum
+                               )
         
     passage_data = DB.session.query(models.Passages,
                                     models.Users
@@ -368,23 +393,26 @@ def show_posts(post_id):
                                         models.Passages.user_id == models.Users.user_id
                                         ).filter(models.Passages.passage_id==passage_id).first()
 
+    parent_like_sum = len(models.PassageLikes.query.filter(models.PassageLikes.passage_id==passage_id).all())
     parent_content = passage_data.Passages.passage_content
     book_title = passage_data.Passages.book_title
-    book_title_needed_flag = True
+    is_passage = True
     parent_user_name = passage_data.Users.user_name
     parent_user_id = passage_data.Passages.user_id
     passage_id = passage_data.Passages.passage_id
     
     return render_template('comment-thread.html',
                            parent_content=parent_content,
-                           child_data_list=child_data_list,
+                           child_data_and_like_sum_list=zip(child_data_list, child_like_sum_list),
                            book_title=book_title,
-                           book_title_needed_flag=book_title_needed_flag,
+                           is_passage=is_passage,
                            parent_user_name=parent_user_name,
                            parent_user_id=parent_user_id,
                            current_user_id=current_user.user_id,
-                           parent_post_id=parent_post_id
-                           )  # good_sumに変わるいいね数を算出する処理を行うlike_sumという変数に入れるTodo
+                           parent_post_id=parent_post_id,
+                           parent_like_sum=parent_like_sum,
+                           passage_id=passage_id
+                           )
 
 
 @app.route('/submit-comment/<int:parent_post_id>', methods=['POST'])
@@ -407,19 +435,75 @@ def post_comment(parent_post_id):
     
     insert_comment_relation_data = models.PassageCommentRelations(
         parent_id=parent_post_id,
-        child_id=insert_comment_data.comment_id
+        child_id=insert_post_ID_data.post_id
     )
     
     DB.session.add(insert_comment_relation_data)
     DB.session.commit()
     
-    return redirect(url_for('show_posts',
-                                post_id=parent_post_id
-                                )
-                        )
+    return redirect(url_for(
+        'show_posts',
+        post_id=parent_post_id
+        )
+                    )
+
+
+@app.route('/comment/<string:post_id>/push-like/<int:parent_post_id>', methods=['POST'])
+def push_like_button_comment(post_id, parent_post_id):
+    current_user_id = current_user.user_id
+    comment_id = models.PostIDs.query.filter_by(post_id=post_id).first().comment_id
+
+    has_user_already_push_liked = models.CommentLikes.query.filter_by(comment_id=comment_id, user_id=current_user_id).first()
+    
+    if has_user_already_push_liked is None:
+        insert_data = models.CommentLikes(
+            user_id=current_user_id,
+            comment_id=comment_id,
+            created_at=datetime.datetime.now()
+        )
+
+        DB.session.add(insert_data)
+        DB.session.commit()
+    else:
+        delete_data = has_user_already_push_liked
+        DB.session.delete(delete_data)
+        DB.session.commit()
+    
+    return redirect(url_for(
+        'show_posts',
+        post_id=parent_post_id
+        )
+                    )
+
+
+@app.route('/comment/<int:comment_id>/delete/<int:parent_post_id>', methods=['POST'])
+@app.route('/comment/<int:comment_id>/delete')
+def delete_comment(comment_id, parent_post_id=-1):
+    post_id = models.PostIDs.query.filter_by(comment_id=comment_id).first().post_id
+    
+    models.PassageCommentRelations.query.filter_by(parent_id=post_id).delete()
+    models.PassageCommentRelations.query.filter_by(child_id=post_id).delete()
+    models.CommentLikes.query.filter_by(comment_id=comment_id).delete()
+    
+    delete_passage_data = DB.session.query(models.Comments).filter_by(comment_id=comment_id).first()
+    delete_post_IDs_data = models.PostIDs.query.filter_by(comment_id=comment_id).first()
+    
+    DB.session.delete(delete_passage_data)
+    DB.session.delete(delete_post_IDs_data)
+    DB.session.commit()
+    
+    if parent_post_id == -1:
+        return redirect(url_for('show_main_page'))
+    
+    return redirect(url_for(
+        'show_posts',
+        post_id=parent_post_id
+        )
+                    )
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
-    logout_user()
     DB.drop_all()
     DB.create_all()
+    logout_user()

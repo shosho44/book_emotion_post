@@ -20,6 +20,16 @@ class Comments(DB.Model):
     created_at = DB.Column(DB.DateTime, nullable=False)
 
 
+class CommentLikes(DB.Model):
+    
+    __tablename__ = 'comment_likes'
+    
+    like_id = DB.Column(DB.Integer, primary_key=True)
+    user_id = DB.Column(DB.String(128), DB.ForeignKey('users.user_id'), nullable=False)
+    comment_id = DB.Column(DB.Integer, DB.ForeignKey('comments.comment_id'), nullable=False)
+    created_at = DB.Column(DB.DateTime, nullable=False)
+
+
 class Passages(DB.Model):
     
     __tablename__ = 'passages'

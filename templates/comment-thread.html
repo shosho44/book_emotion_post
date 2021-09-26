@@ -19,7 +19,7 @@
                         <p>{{ parent_content }}</p>
                     </div>
                 </div>
-                {% if book_title_needed_flag == False %}
+                {% if is_passage == True %}
                 <div class="w-b-b-a m-a w-400">
                     <span><i class="fas fa-book-open m-r-5"></i>{{ book_title }}</span>
                 </div>
@@ -33,24 +33,37 @@
                             <a class="c-110-110-110-hover" href="/user/{{ parent_user_id }}">{{ parent_user_name }}</a>
                         </div>
                         <div class="d-f w-28per">
-                            <form action="/passage/{{ passage_id }}/push-like" method="POST">
+                            {% if is_passage == True %}
+                            <form action="/passage/{{ passage_id }}/push-like/{{ parent_post_id }}" method="POST">
                                 <button type="submit"><i class="far fa-heart m-r-5"></i></button>
                             </form>
-                            <a class="c-110-110-110-hover" href="/passage/{{ passage_id }}/likes">a</a>
+                            <a class="c-110-110-110-hover" href="/passage/{{ passage_id }}/likes">{{ parent_like_sum }}</a>
+                            {% else %}
+                            <form action="/comment/{{ parent_post_id }}/push-like/{{ parent_post_id }}" method="POST">
+                                <button type="submit"><i class="far fa-heart m-r-5"></i></button>
+                            </form>
+                            <a class="c-110-110-110-hover" href="/comment/{{ passage_id }}/likes">{{ parent_like_sum }}</a>
+                            {% endif %}
                         </div>
+                        {% if parent_user_id == current_user_id %}
                         <div class="t-a-r w-16per">
-                            {% if parent_user_id == current_user_id %}
+                            {% if is_passage == True %}
                             <form action="/passage/{{ passage_id }}/delete" method="POST">
                                 <button type="submit"><i class="fas fa-trash"></i></button>
                             </form>
+                            {% else %}
+                            <form action="/comment/{{ comment_id }}/delete" method="POST">
+                                <button type="submit"><i class="fas fa-trash c-110-110-110-hover"></i></button>
+                            </form>
                             {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
             <div class="b-r-10 m-t-10 m-b-10">
-                {% for child_data in child_data_list %}
+                {% for child_data, child_like_sum in child_data_and_like_sum_list %}
                 <div class="b-g-c-232-219-188-0_91 b-r-10 m-t-10 m-b-10">
                     <div class="m-a p-b-15 p-t-15">
                         <div class="w-b-b-a m-a-10 w-400">
@@ -66,20 +79,20 @@
                                 <a class="c-110-110-110-hover" href="/user/{{ child_data.Comments.user_id }}">{{ child_data.Users.user_name }}</a>
                             </div>
                             <div class="d-f w-28per">
-                                <form action="/comment/{{ child_data.Comments.comment_id }}/push-like" method="POST">
+                                <form action="/comment/{{ child_data.PostIDs.post_id }}/push-like/{{ parent_post_id }}" method="POST">
                                     <button type="submit"><i class="far fa-heart m-r-5"></i></button>
                                 </form>
-                                <a class="c-110-110-110-hover" href="/comment/{{ child_data.Comments.comment_id }}/likes">a</a>
+                                <a class="c-110-110-110-hover" href="/comment/{{ child_data.Comments.comment_id }}/likes">{{ child_like_sum }}</a>
                             </div>
                             <div class="w-16per">
                                 <a class="c-110-110-110-hover" href="/comment/{{ child_data.PostIDs.post_id }}">コメント</a>
                             </div>
                             <div class="t-a-r w-16per">
                                 {% if child_data.Comments.user_id == current_user_id %}
-                                <form action="/comment/{{ child_data.Comments.comment_id }}/delete" method="POST">
+                                <form action="/comment/{{ child_data.Comments.comment_id }}/delete/{{ parent_post_id }}" method="POST">
                                     <button type="submit"><i class="fas fa-trash c-110-110-110-hover"></i></button>
                                 </form>
-                            {% endif %}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
