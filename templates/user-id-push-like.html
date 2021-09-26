@@ -7,9 +7,9 @@
     <title>いいねした人のid一覧 | ブクエモ！</title>
 </head>
 <body>
-    {% for user_push_good_information in some_user_push_good_information %}
+    {% for passage_likes_data in passage_likes_data_list %}
         <div>
-            <span>{{ user_push_good_information.user_id_push_good_reply }}</span>
+            <span>{{ passage_likes_data.user_id }}</span>
         </div>
     {% endfor %}
 </body>

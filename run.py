@@ -1,109 +1,59 @@
 # coding: UTF-8
 import base64
-import time
+import datetime
 from flask import Flask, render_template, url_for, redirect, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import current_user, login_user, logout_user, login_required, UserMixin
+from flask_login import current_user, login_user, logout_user, login_required
 import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__, static_folder='static')
+import config
+from model import models
 
-# データベースの設定
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db'  # sqliteを使っている
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['APPLICATION_ROOT'] = '/'
-db = SQLAlchemy(app)
+app = config.app
+DB  = config.DB
 
-with open('static/img/sample_image_human.png', mode='rb') as f:
-    default_user_image_base64 = base64.b64encode(f.read())
-
-
-class PostArticle(db.Model):
-    
-    __tablename__ = 'articles'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(128), nullable=False)
-    user_name = db.Column(db.String(128), nullable=False)
-    book_title = db.Column(db.String(128), nullable=False, default='不明')
-    post_content = db.Column(db.String(128), nullable=False)
-    created_at = db.Column(db.Float, nullable=False)
-    good_sum = db.Column(db.Integer, nullable=False, default=0)
-
-
-class ReplyInformation(db.Model):
-    
-    __tablename__ = 'articlereply'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    article_id = db.Column(db.String(128), nullable=True)  # 投稿に対してのリプ
-    reply_to_reply_article_id = db.Column(db.String(128), nullable=True)  # リプに対してのリプ
-    reply_user_id = db.Column(db.String(128), nullable=False)
-    reply_user_name = db.Column(db.String(128), nullable=False)
-    reply_content = db.Column(db.String(128), nullable=False)
-    created_at = db.Column(db.Float, nullable=False)
-    good_sum = db.Column(db.Integer, nullable=False, default=0)
-
-
-class UserInformation(UserMixin, db.Model):
-    
-    __tablename__ = 'users'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(128), nullable=False)
-    password = db.Column(db.String(128), nullable=False)
-    user_name = db.Column(db.String(128), nullable=False)
-    email_address = db.Column(db.String(128), nullable=False)
-    self_introduction = db.Column(db.String(128), nullable=False, default='')
-    user_image = db.Column(db.LargeBinary, nullable=False, default=default_user_image_base64)
-
-
-class UserAndPushedGoodButtonArticle(db.Model):
-    
-    __tablename__ = 'user_and_pushed_good_button_article'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id_push_good_article = db.Column(db.String(128), nullable=False)
-    article_id = db.Column(db.Integer, nullable=False)
-
-
-class UserAndPushedGoodButtonReply(db.Model):
-    
-    __tablename__ = 'user_and_pushed_good_button_reply'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id_push_good_reply = db.Column(db.String(128), nullable=False)
-    article_id = db.Column(db.Integer, nullable=False)  # ReplyInformationのidを入れる
-
-
-app.secret_key = 'secret key'  # セッションを有効にするために必要
-app.config['SECRET_KEY'] = 'secret'
 
 login_manager = flask_login.LoginManager()
-login_manager.login_view = 'signin'  # 参考URL:https://teratail.com/questions/167338
+login_manager.login_view = 'signin'
 login_manager.init_app(app)
 
 
-# ログインが必要なページに行くたびに実行される.セッションからユーザーをリロードする。
-# 認証ユーザの呼び出し方を定義している
 @login_manager.user_loader
 def load_user(user_id):
-    is_user_information_exist = UserInformation.query.get(user_id)
-    if is_user_information_exist:
-        return is_user_information_exist
-    else:
-        return ''
+    return DB.session.query(models.UserLoginInformation).filter_by(user_id=user_id).first()
 
 
 @app.route('/', methods=['GET'])
+@login_required
 def show_main_page():
     if current_user.is_authenticated is False:
         return redirect(url_for('signin'))
     
-    some_data = PostArticle.query.order_by(PostArticle.created_at.desc()).all()
+    passages_information_table = DB.session.query(models.Passages,
+                                                  models.Users,
+                                                  models.PostIDs
+                                                  ).join(
+                                                      models.Users,
+                                                      models.Passages.user_id == models.Users.user_id
+                                                      ).join(
+                                                          models.PostIDs,
+                                                          models.Passages.passage_id == models.PostIDs.passage_id
+                                                      )
+    
+    passages_information_list = passages_information_table.order_by(models.Passages.created_at.desc()).all()
     current_user_id = current_user.user_id
-    return render_template('index.html', some_data=some_data, current_user_id=current_user_id)
+    
+    passage_like_sum_list = []
+    
+    for passages_information in passages_information_list:
+        passage_like_sum = len(models.PassageLikes.query.filter_by(passage_id=passages_information.Passages.passage_id).all())
+        
+        passage_like_sum_list.append(passage_like_sum)
+    
+    return render_template('main-page.html',
+                           ziped_list = zip(passages_information_list, passage_like_sum_list),
+                           current_user_id=current_user_id
+                           )
 
 
 @app.route('/signin', methods=['GET'])
@@ -116,15 +66,15 @@ def signin_confirm():
     user_id = request.form['user_id']
     password = request.form['password']
     
-    users = UserInformation
-    is_user = users.query.filter_by(user_id=user_id).first()
+    user = models.Users.query.filter_by(user_id=user_id).first()
     
-    if is_user is None or not check_password_hash(is_user.password, password):
+    user_login_information = models.UserLoginInformation(user_id=user_id)
+    
+    if user is None or not check_password_hash(user.password, password):
         return redirect(url_for('signin'))
-    else:
-        user = is_user
-        login_user(user)
-        return redirect(url_for('show_main_page'))
+    
+    login_user(user_login_information)
+    return redirect(url_for('show_main_page'))
 
 
 @app.route('/signup', methods=['GET'])
@@ -139,313 +89,421 @@ def signup_confirm():
     email_address = request.form['email_address']
     password = request.form['password']
     
-    is_user_exist = UserInformation.query.filter_by(email_address=email_address).first()
+    is_user_exist = models.Users.query.filter_by(email_address=email_address).first()
     if is_user_exist:
         return redirect(url_for('signup'))
     
-    user_information = UserInformation(user_id=user_id, password=generate_password_hash(password, method='sha256'),
-                                       user_name=user_name, email_address=email_address)
-    db.session.add(user_information)
-    db.session.commit()
+    insert_user_data = models.Users(
+        user_id=user_id,
+        password=generate_password_hash(password, method='sha256'),
+        user_name=user_name,
+        email_address=email_address,
+        created_at=datetime.datetime.now()
+    )
     
-    user = user_information
-    login_user(user)
+    insert_user_login_information_data = models.UserLoginInformation(user_id=user_id)
+    
+    DB.session.add(insert_user_data)
+    DB.session.add(insert_user_login_information_data)
+    DB.session.commit()
+    
+    login_user(insert_user_login_information_data)
     
     return redirect(url_for('show_main_page'))
 
 
-# 投稿した時の処理
-@app.route('/post-article', methods=['POST'])
-def post_article():
-    post_content = request.form['post-article']
-    book_title = request.form['book-title']
+@app.route('/post-passage', methods=['POST'])
+def post_passage():
+    passage_content = request.form['passage_content']
+    book_title = request.form['book_title']
     
-    user_id = current_user.user_id
+    current_user_id = current_user.user_id
     
     if book_title == '':
         book_title = '不明'
     
-    is_post_user_name = UserInformation.query.filter_by(user_id=user_id).first()
-    if is_post_user_name is None:
-        user_name = 'unknown_user'
-    else:
-        user_name = is_post_user_name.user_name
+    insert_passage_data = models.Passages(
+        user_id=current_user_id,
+        book_title=book_title,
+        passage_content=passage_content,
+        created_at=datetime.datetime.now()
+    )
     
-    some_data = PostArticle(user_id=user_id, user_name=user_name, book_title=book_title, post_content=post_content, created_at=time.time())
+    DB.session.add(insert_passage_data)
+    DB.session.commit()
     
-    db.session.add(some_data)
-    db.session.commit()
+    insert_post_IDs_data = models.PostIDs(passage_id=insert_passage_data.passage_id)
+    
+    DB.session.add(insert_post_IDs_data)
+    DB.session.commit()
+    
+    insert_passage_coments_relations_data = models.PassageCommentRelations(parent_id=insert_post_IDs_data.post_id)
+    
+    DB.session.add(insert_passage_coments_relations_data)
+    DB.session.commit()
     
     return redirect(url_for('show_main_page'))
 
 
-@app.route('/passage/<string:article_id>/delete', methods=['POST'])
-def delete_passage(article_id=''):
-    delete_passage_data = db.session.query(PostArticle).filter_by(id=article_id).first()
-    db.session.delete(delete_passage_data)
-    db.session.commit()
+@app.route('/passage/<string:passage_id>/delete', methods=['POST'])
+def delete_passage(passage_id=''):
+    post_id = models.PostIDs.query.filter_by(passage_id=passage_id).first().post_id
     
-    return redirect(url_for('show_main_page'))  # user-profileから投稿削除した時はuser-profileを返したい
+    models.PassageCommentRelations.query.filter_by(parent_id=post_id).delete()
+    models.PassageCommentRelations.query.filter_by(child_id=post_id).delete()
+    models.PassageLikes.query.filter_by(passage_id=passage_id).delete()
+    
+    delete_passage_data = DB.session.query(models.Passages).filter_by(passage_id=passage_id).first()
+    delete_post_IDs_data = models.PostIDs.query.filter_by(passage_id=passage_id).first()
+    
+    DB.session.delete(delete_passage_data)
+    DB.session.delete(delete_post_IDs_data)
+    DB.session.commit()
+    
+    return redirect(url_for('show_main_page'))  # user-profileから投稿削除した時はuser-profileを返したいtodo
 
 
-@app.route('/user/<string:profile_user_id>', methods=['GET'])
-def user_profile(profile_user_id=''):
+@app.route('/passage/<int:passage_id>/push-like/<int:parent_post_id>', methods=['POST'])
+@app.route('/passage/<int:passage_id>/push-like', methods=['POST'])
+def push_like_button_passage(passage_id, parent_post_id=-1):
+    current_user_id = current_user.user_id
+    
+    has_user_already_push_liked = models.PassageLikes.query.filter_by(passage_id=passage_id, user_id=current_user_id).first()
+    
+    if has_user_already_push_liked is None:
+        insert_data = models.PassageLikes(
+            user_id=current_user_id,
+            passage_id=passage_id,
+            created_at=datetime.datetime.now()
+        )
+
+        DB.session.add(insert_data)
+        DB.session.commit()
+    else:
+        delete_data = has_user_already_push_liked
+        DB.session.delete(delete_data)
+        DB.session.commit()
+    
+    if parent_post_id != -1:
+        return redirect(url_for(
+            'show_posts',
+            post_id=parent_post_id
+            )
+                        )
+    
+    return redirect(url_for('show_main_page'))
+
+
+@app.route('/passage/<string:passage_id>/likes', methods=['GET'])
+def show_user_push_good(passage_id=''):
     if current_user.is_authenticated is False:
         return redirect(url_for('signin'))
     
-    user = UserInformation.query.filter_by(user_id=profile_user_id).first()
-    user_name = user.user_name
-    self_introduction = user.self_introduction
+    passage_likes_data_list = models.PassageLikes.query.filter_by(passage_id=passage_id).all()
+    
+    return render_template('user-id-push-like.html',
+                           passage_likes_data_list=passage_likes_data_list
+                           )
+
+
+@app.route('/user/<string:user_id>', methods=['GET'])
+def show_user_profile(user_id=''):
+    if current_user.is_authenticated is False:
+        return redirect(url_for('signin'))
+    
+    user = models.Users.query.filter_by(user_id=user_id).first()
     user_image = user.user_image.decode()
     
     current_user_id = current_user.user_id
-    if current_user_id == profile_user_id:
-        is_current_user_equal_article_user = True
-    else:
-        is_current_user_equal_article_user = False
     
-    is_article_exist = PostArticle.query.filter_by(user_id=profile_user_id).order_by(PostArticle.created_at.desc()).all()
+    is_current_user_equal_profile_user = False
+    if current_user_id == user_id:
+        is_current_user_equal_profile_user = True
     
-    if is_article_exist:
-        some_article_data = is_article_exist
-        return render_template('user-profile.html', user_id=profile_user_id, user_name=user_name, self_introduction=self_introduction,
-                               user_image=user_image, is_current_user_equal_article_user=is_current_user_equal_article_user,
-                               some_article_data=some_article_data)
-    else:
-        return render_template('user-profile.html', user_id=profile_user_id, user_name=user_name, self_introduction=self_introduction,
-                               user_image=user_image, is_current_user_equal_article_user=is_current_user_equal_article_user)
+    passages_information_list = DB.session.query(models.Passages,
+                                          models.PostIDs
+                                          ).join(
+                                              models.PostIDs,
+                                              models.Passages.passage_id == models.PostIDs.passage_id
+                                              ).filter(models.Passages.user_id==user_id).order_by(models.Passages.created_at.desc()).all()
+
+    if passages_information_list is None:
+        passages_information_list = []
+    
+    passage_like_sum_list = []
+    
+    for passages_information in passages_information_list:
+        passage_like_sum = len(models.PassageLikes.query.filter_by(passage_id=passages_information.Passages.passage_id).all())
+        
+        passage_like_sum_list.append(passage_like_sum)
+        
+    return render_template('user-profile.html',
+                           user=user,
+                           current_user_id=current_user.user_id,
+                           user_image=user_image,
+                           is_current_user_equal_profile_user=is_current_user_equal_profile_user,
+                           ziped_passages_and_like_sum_data_list=zip(passages_information_list, passage_like_sum_list)
+                           )  #  good_sumに変わるいいね数を算出する処理を行うlike_sumという変数に入れるTodo
 
 
-# profile_user_idがcurrent_user_idと違う場合アクセス権限がない旨を表示する
-@app.route('/user/<string:profile_user_id>/edit', methods=['GET'])
-def edit_user_profile(profile_user_id=''):
-    if current_user.is_authenticated is False:
-        return redirect(url_for('signin'))
+@app.route('/user/<string:user_id>/edit', methods=['GET'])
+def edit_user_profile(user_id=''):
+    current_user_id = current_user.user_id
+    if current_user_id != user_id:
+        return redirect(url_for('show_user_profile',
+                                user_id=user_id
+                                )
+                        )
     
-    user_id = current_user.user_id
-    user_name = current_user.user_name
-    self_introduction = UserInformation.query.filter_by(user_id=user_id).first().self_introduction
-    user_image = UserInformation.query.filter_by(user_id=user_id).first().user_image.decode()
-    
-    return render_template('edit-user-profile.html', user_id=user_id, user_name=user_name, self_introduction=self_introduction, user_image=user_image)
+    user = models.Users.query.filter_by(user_id=user_id).first()
+    user_image = user.user_image.decode()
+    return render_template('edit-user-profile.html',
+                           current_user_id=user_id,
+                           user_image=user_image
+                           )
 
 
-# user_profileに関係している
-@app.route('/user/<string:profile_user_id>/update', methods=['POST'])
-@login_required
-def update_user_profile(profile_user_id=''):
-    user_id = current_user.user_id
+@app.route('/user/<string:user_id>/update', methods=['POST'])
+def update_user_profile(user_id=''):
     user_name = request.form['user_name']
     self_introduction = request.form['self_introduction']
     
-    user = db.session.query(UserInformation).filter(UserInformation.user_id == user_id).first()
+    user = models.Users.query.filter_by(user_id=user_id).first()
     user.user_name = user_name
     user.self_introduction = self_introduction
     
-    db.session.commit()
+    DB.session.commit()
     
-    return redirect(url_for('user_profile', profile_user_id=user_id))
+    return redirect(url_for('show_user_profile',
+                            user_id=user_id
+                            )
+                    )
 
 
-# profile_user_idがcurrent_user_idと違う場合アクセス権限がない旨を表示する
-@app.route('/user/<string:profile_user_id>/edit/image/upload', methods=['POST'])
-@login_required
-def upload_user_image(profile_user_id=''):
-    current_user_id = current_user.user_id
+@app.route('/user/<string:user_id>/edit/image/upload', methods=['POST'])
+def upload_user_image(user_id=''):
     if 'user_image' not in request.files:
-        return redirect(url_for('/user/{}/edit'.format(current_user_id)))
+        return redirect(url_for('/user/{}/edit'.format(user_id)))
     
     user_image = request.files['user_image'].stream.read()
     user_image_base64 = base64.b64encode(user_image)
     
-    user = db.session.query(UserInformation).filter(UserInformation.user_id == current_user.user_id).first()
+    user = models.Users.query.filter_by(user_id=user_id).first()
     user.user_image = user_image_base64
     
-    db.session.commit()  # 変更するかも。今の段階ではデータベースに登録する必要なしかも
+    DB.session.commit()
     
-    return redirect(url_for('user_profile', profile_user_id=profile_user_id))
+    return redirect(url_for('show_user_profile',
+                            user_id=user_id
+                            )
+                    )
 
 
-# アクセス権限がない旨を表示する
-@app.route('/user/<string:profile_user_id>/edit/image', methods=['GET'])
-def show_upload_user_image(profile_user_id=''):
-    if current_user.is_authenticated is False:
-        return redirect(url_for('signin'))
-    
+@app.route('/user/<string:user_id>/edit/image', methods=['GET'])
+def show_edit_user_image(user_id=''):
     current_user_id = current_user.user_id
+    if user_id != current_user_id:
+        return redirect(url_for('show_user_profile',
+                                user_id=user_id
+                                )
+                        )
     
-    return render_template('upload-user-image.html', user_id=current_user_id)
+    return render_template('edit-user-image.html',
+                           user_id=user_id
+                           )
 
 
 @app.route('/logout', methods=['GET'])
-def logout_confirm():
-    if current_user.is_authenticated is False:
-        return redirect(url_for('signin'))
+def show_logout():
+    current_user_id = current_user.user_id
     
-    user_id = current_user.user_id
-    return render_template('logout-confirm.html', user_id=user_id)
+    return render_template('logout-confirm.html',
+                           user_id=current_user_id
+                           )  # mainページからの場合はメインに返す
 
 
 @app.route('/run-logout', methods=['POST'])
-@login_required
-def run_logout():  # signinのURLに飛ぶときはログアウトする処理を書けばこの関数をなくして一つにまとめられるかもしれない
+def run_logout():
     logout_user()
+    print(current_user.is_authenticated)
     return redirect(url_for('signin'))
 
 
-@app.route('/submit-reply/<string:article_id>', methods=['POST'])
-def submit_reply(article_id=''):
-    reply_content = request.form['reply_content']
+@app.route('/comment/<int:post_id>', methods=['GET'])
+def show_posts(post_id):
+    passage_id = models.PostIDs.query.filter_by(post_id=post_id).first().passage_id
+    parent_post_id = post_id
     
-    reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
+    child_data_table = DB.session.query(models.Comments,
+                                        models.PassageCommentRelations,
+                                        models.PostIDs,
+                                        models.Users
+                                        ).join(
+                                            models.PostIDs,
+                                            models.Comments.comment_id == models.PostIDs.comment_id
+                                            ).join(
+                                                models.PassageCommentRelations,
+                                                models.PostIDs.post_id == models.PassageCommentRelations.child_id
+                                            ).join(
+                                                models.Users,
+                                                models.Comments.user_id == models.Users.user_id
+                                                )
+    child_data_list = child_data_table.filter(models.PassageCommentRelations.parent_id == parent_post_id).order_by(models.Comments.created_at.desc()).all()
     
-    reply_information = ReplyInformation(article_id=article_id, reply_user_id=current_user.user_id,
-                                         reply_user_name=reply_user_name, reply_content=reply_content, created_at=time.time())
+    child_like_sum_list = []
     
-    db.session.add(reply_information)
-    db.session.commit()
-    return redirect(url_for('reply_thread', article_id=article_id))
+    for child_data in child_data_list:
+        comment_like_sum = len(models.CommentLikes.query.filter_by(comment_id=child_data.Comments.comment_id).all())
+        child_like_sum_list.append(comment_like_sum)
+        
+    if passage_id == -1:
+        parent_content = parent_user_name = parent_user_id = ''
+        is_passage = False
+        
+        comment_id = models.PostIDs.query.filter_by(post_id=post_id).first().comment_id
+        
+        comment_data = DB.session.query(models.Comments,
+                                        models.Users
+                                        ).join(
+                                            models.Users,
+                                            models.Comments.user_id == models.Users.user_id
+                                            ).filter(models.Comments.comment_id==comment_id).first()
+        
+        parent_content = comment_data.Comments.comment_content
+        parent_user_id = comment_data.Users.user_id
+        parent_user_name = comment_data.Users.user_name
+        parent_like_sum = len(models.CommentLikes.query.filter(models.CommentLikes.comment_id==comment_id).all())
+        
+        
+        return render_template('comment-thread.html',
+                               parent_content=parent_content,
+                               child_data_and_like_sum_list=zip(child_data_list, child_like_sum_list),
+                               is_passage=is_passage,
+                               parent_user_name=parent_user_name,
+                               parent_user_id=parent_user_id,
+                               current_user_id=current_user.user_id,
+                               parent_post_id=parent_post_id,
+                               parent_like_sum=parent_like_sum
+                               )
+        
+    passage_data = DB.session.query(models.Passages,
+                                    models.Users
+                                    ).join(
+                                        models.Users,
+                                        models.Passages.user_id == models.Users.user_id
+                                        ).filter(models.Passages.passage_id==passage_id).first()
+
+    parent_like_sum = len(models.PassageLikes.query.filter(models.PassageLikes.passage_id==passage_id).all())
+    parent_content = passage_data.Passages.passage_content
+    book_title = passage_data.Passages.book_title
+    is_passage = True
+    parent_user_name = passage_data.Users.user_name
+    parent_user_id = passage_data.Passages.user_id
+    passage_id = passage_data.Passages.passage_id
+    
+    return render_template('comment-thread.html',
+                           parent_content=parent_content,
+                           child_data_and_like_sum_list=zip(child_data_list, child_like_sum_list),
+                           book_title=book_title,
+                           is_passage=is_passage,
+                           parent_user_name=parent_user_name,
+                           parent_user_id=parent_user_id,
+                           current_user_id=current_user.user_id,
+                           parent_post_id=parent_post_id,
+                           parent_like_sum=parent_like_sum,
+                           passage_id=passage_id
+                           )
 
 
-@app.route('/reply/<string:article_id>', methods=['GET'])
-def reply_thread(article_id=''):
-    if current_user.is_authenticated is False:
-        return redirect(url_for('signin'))
+@app.route('/submit-comment/<int:parent_post_id>', methods=['POST'])
+def post_comment(parent_post_id):
+    comment_content = request.form['comment_content']
     
+    insert_comment_data = models.Comments(
+        user_id=current_user.user_id,
+        comment_content=comment_content,
+        created_at=datetime.datetime.now()
+    )
+    
+    DB.session.add(insert_comment_data)
+    DB.session.commit()
+    
+    insert_post_ID_data = models.PostIDs(comment_id=insert_comment_data.comment_id)
+    
+    DB.session.add(insert_post_ID_data)
+    DB.session.commit()
+    
+    insert_comment_relation_data = models.PassageCommentRelations(
+        parent_id=parent_post_id,
+        child_id=insert_post_ID_data.post_id
+    )
+    
+    DB.session.add(insert_comment_relation_data)
+    DB.session.commit()
+    
+    return redirect(url_for(
+        'show_posts',
+        post_id=parent_post_id
+        )
+                    )
+
+
+@app.route('/comment/<string:post_id>/push-like/<int:parent_post_id>', methods=['POST'])
+def push_like_button_comment(post_id, parent_post_id):
     current_user_id = current_user.user_id
+    comment_id = models.PostIDs.query.filter_by(post_id=post_id).first().comment_id
+
+    has_user_already_push_liked = models.CommentLikes.query.filter_by(comment_id=comment_id, user_id=current_user_id).first()
     
-    article_data = PostArticle.query.filter_by(id=article_id).first()
-    
-    some_reply_data = ReplyInformation.query.filter_by(article_id=article_id).order_by(ReplyInformation.created_at.desc()).all()
-    
-    if article_data:
-        return render_template('reply_thread.html', article_data=article_data, some_reply_data=some_reply_data, current_user_id=current_user_id)
+    if has_user_already_push_liked is None:
+        insert_data = models.CommentLikes(
+            user_id=current_user_id,
+            comment_id=comment_id,
+            created_at=datetime.datetime.now()
+        )
+
+        DB.session.add(insert_data)
+        DB.session.commit()
     else:
-        return render_template('reply_thread.html', article_data=article_data)
-
-
-@app.route('/passage/<string:article_id>/push-like', methods=['POST'])
-def push_good_button(article_id=''):
-    article = PostArticle.query.filter_by(id=article_id).first()
-    user_id_push_good_button = current_user.user_id
+        delete_data = has_user_already_push_liked
+        DB.session.delete(delete_data)
+        DB.session.commit()
     
-    is_user_already_push_good_button = UserAndPushedGoodButtonArticle.query.filter_by(
-        user_id_push_good_article=user_id_push_good_button, article_id=article_id).first()
-    if is_user_already_push_good_button:
-        article.good_sum -= 1
-        
-        delete_information_of_user_and_pushed_good_button_article = db.session.query(UserAndPushedGoodButtonArticle).filter_by(
-            user_id_push_good_article=user_id_push_good_button, article_id=article_id).first()
-        db.session.delete(delete_information_of_user_and_pushed_good_button_article)
-        db.session.commit()
-        
+    return redirect(url_for(
+        'show_posts',
+        post_id=parent_post_id
+        )
+                    )
+
+
+@app.route('/comment/<int:comment_id>/delete/<int:parent_post_id>', methods=['POST'])
+@app.route('/comment/<int:comment_id>/delete')
+def delete_comment(comment_id, parent_post_id=-1):
+    post_id = models.PostIDs.query.filter_by(comment_id=comment_id).first().post_id
+    
+    models.PassageCommentRelations.query.filter_by(parent_id=post_id).delete()
+    models.PassageCommentRelations.query.filter_by(child_id=post_id).delete()
+    models.CommentLikes.query.filter_by(comment_id=comment_id).delete()
+    
+    delete_passage_data = DB.session.query(models.Comments).filter_by(comment_id=comment_id).first()
+    delete_post_IDs_data = models.PostIDs.query.filter_by(comment_id=comment_id).first()
+    
+    DB.session.delete(delete_passage_data)
+    DB.session.delete(delete_post_IDs_data)
+    DB.session.commit()
+    
+    if parent_post_id == -1:
         return redirect(url_for('show_main_page'))
     
-    article.good_sum += 1
-    
-    user_and_pushed_good_button_article = UserAndPushedGoodButtonArticle(user_id_push_good_article=user_id_push_good_button, article_id=article_id)
-    
-    db.session.add(user_and_pushed_good_button_article)
-    db.session.commit()
-    
-    return redirect(url_for('show_main_page'))
-
-
-@app.route('/passage/<string:article_id>/likes', methods=['GET'])
-def show_user_push_good(article_id=''):
-    if current_user.is_authenticated is False:
-        return redirect(url_for('signin'))
-    
-    some_user_push_good_information = UserAndPushedGoodButtonArticle.query.filter_by(article_id=article_id).all()
-    
-    return render_template('show-user-id-push-good.html', some_user_push_good_information=some_user_push_good_information)
-
-
-# /push-good-button-reply
-@app.route('/reply/<string:reply_id>/push-like/<string:article_id>', methods=['POST'])
-def push_good_button_reply(reply_id='', article_id=''):
-    reply = ReplyInformation.query.filter_by(id=reply_id).first()
-    
-    user_id_push_good_button = current_user.user_id
-    
-    is_user_already_push_good_button = UserAndPushedGoodButtonReply.query.filter_by(user_id_push_good_reply=user_id_push_good_button,
-                                                                                    article_id=reply_id).first()
-    if is_user_already_push_good_button:
-        reply.good_sum -= 1
-        
-        delete_information_of_user_and_pushed_good_button_reply = db.session.query(UserAndPushedGoodButtonReply).filter_by(
-            user_id_push_good_reply=user_id_push_good_button, article_id=reply_id).first()
-        db.session.delete(delete_information_of_user_and_pushed_good_button_reply)
-        db.session.commit()
-        
-        return redirect(url_for('reply_thread', article_id=article_id))
-    
-    reply.good_sum += 1
-    
-    user_and_pushed_good_button_article = UserAndPushedGoodButtonReply(user_id_push_good_reply=user_id_push_good_button, article_id=reply_id)
-    
-    db.session.add(user_and_pushed_good_button_article)
-    db.session.commit()
-    
-    return redirect(url_for('reply_thread', article_id=article_id))
-
-
-@app.route('/reply/<string:article_id>/likes', methods=['GET'])
-def show_user_push_good_reply(article_id=''):
-    if current_user.is_authenticated is False:
-        return redirect(url_for('signin'))
-    
-    some_user_push_good_information = UserAndPushedGoodButtonReply.query.filter_by(article_id=article_id).all()
-    
-    return render_template('show-user-id-push-good-reply.html', some_user_push_good_information=some_user_push_good_information)
-
-
-# delete-reply
-@app.route('/reply/<string:reply_id>/delete/<article_id>', methods=['POST'])
-def delete_article_from_user_profile_reply(reply_id='', article_id=''):
-    id = reply_id
-    
-    delete_reply_data = db.session.query(ReplyInformation).filter_by(id=id).first()
-    db.session.delete(delete_reply_data)
-    db.session.commit()
-    
-    return redirect(url_for('reply_thread', article_id=article_id))
-
-
-@app.route('/reply-to-reply/<string:id>', methods=['GET'])
-def reply_to_reply(id=''):
-    if current_user.is_authenticated is False:
-        return redirect(url_for('signin'))
-    
-    current_user_id = current_user.user_id
-    
-    article_data = ReplyInformation.query.filter_by(id=id).first()
-    
-    some_reply_data = ReplyInformation.query.filter_by(reply_to_reply_article_id=id).order_by(ReplyInformation.created_at.desc()).all()
-    
-    if article_data:
-        return render_template('reply_to_reply_thread.html', article_data=article_data, some_reply_data=some_reply_data,
-                               current_user_id=current_user_id)
-    else:
-        return render_template('reply_to_reply_thread.html', article_data=article_data)
-
-
-@app.route('/submit-reply-to-reply/<string:reply_to_reply_article_id>', methods=['POST'])
-def submit_reply_to_reply(reply_to_reply_article_id=''):
-    reply_content = request.form['reply_content']
-    
-    reply_user_name = UserInformation.query.filter_by(user_id=current_user.user_id).first().user_name
-    
-    reply_information = ReplyInformation(reply_to_reply_article_id=reply_to_reply_article_id, reply_user_id=current_user.user_id,
-                                         reply_user_name=reply_user_name, reply_content=reply_content, created_at=time.time())
-    
-    db.session.add(reply_information)
-    db.session.commit()
-    
-    return redirect(url_for('reply_to_reply', id=reply_to_reply_article_id))
+    return redirect(url_for(
+        'show_posts',
+        post_id=parent_post_id
+        )
+                    )
 
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
-    # db.drop_all()
-    db.create_all()
+    DB.drop_all()
+    DB.create_all()
+    logout_user()
