@@ -37,12 +37,12 @@
                             <form action="/passage/{{ passage_id }}/push-like/{{ parent_post_id }}" method="POST">
                                 <button type="submit"><i class="far fa-heart m-r-5"></i></button>
                             </form>
-                            <a class="c-110-110-110-hover" href="/passage/{{ passage_id }}/likes">{{ parent_like_sum }}</a>
+                            <a class="c-110-110-110-hover" href="/post/{{ parent_post_id }}/likes">{{ parent_like_sum }}</a>
                             {% else %}
                             <form action="/comment/{{ parent_post_id }}/push-like/{{ parent_post_id }}" method="POST">
                                 <button type="submit"><i class="far fa-heart m-r-5"></i></button>
                             </form>
-                            <a class="c-110-110-110-hover" href="/comment/{{ passage_id }}/likes">{{ parent_like_sum }}</a>
+                            <a class="c-110-110-110-hover" href="/post/{{ parent_post_id }}/likes">{{ parent_like_sum }}</a>
                             {% endif %}
                         </div>
                         {% if parent_user_id == current_user_id %}
@@ -82,7 +82,7 @@
                                 <form action="/comment/{{ child_data.PostIDs.post_id }}/push-like/{{ parent_post_id }}" method="POST">
                                     <button type="submit"><i class="far fa-heart m-r-5"></i></button>
                                 </form>
-                                <a class="c-110-110-110-hover" href="/comment/{{ child_data.Comments.comment_id }}/likes">{{ child_like_sum }}</a>
+                                <a class="c-110-110-110-hover" href="/post/{{ child_data.PostIDs.post_id }}/likes">{{ child_like_sum }}</a>
                             </div>
                             <div class="w-16per">
                                 <a class="c-110-110-110-hover" href="/comment/{{ child_data.PostIDs.post_id }}">コメント</a>

@@ -5,6 +5,7 @@ from flask import Flask, render_template, url_for, redirect, request
 from flask_login import current_user, login_user, logout_user, login_required
 import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
+from cryptography.fernet import Fernet
 
 import config
 from model import models
@@ -90,14 +91,19 @@ def signup_confirm():
     password = request.form['password']
     
     is_user_exist = models.Users.query.filter_by(email_address=email_address).first()
-    if is_user_exist:
+    if is_user_exist or user_id == '' or user_name == '' or email_address == '' or password == '':
         return redirect(url_for('signup'))
+    
+    key = b'6NpAoIihGtar-gthg9eExg0yKFxBEHkvldg9epEkwg8='  # 変更する必要あり。環境変数に入れよう
+    fernet = Fernet(key)
+    encryptec_email_address = fernet.encrypt(email_address.encode())
+    print(encryptec_email_address)
     
     insert_user_data = models.Users(
         user_id=user_id,
         password=generate_password_hash(password, method='sha256'),
         user_name=user_name,
-        email_address=email_address,
+        email_address=encryptec_email_address,
         created_at=datetime.datetime.now()
     )
     
@@ -194,15 +200,45 @@ def push_like_button_passage(passage_id, parent_post_id=-1):
     return redirect(url_for('show_main_page'))
 
 
-@app.route('/passage/<string:passage_id>/likes', methods=['GET'])
-def show_user_push_good(passage_id=''):
+@app.route('/post/<int:post_id>/likes', methods=['GET'])
+def show_user_push_good(post_id):
     if current_user.is_authenticated is False:
         return redirect(url_for('signin'))
     
-    passage_likes_data_list = models.PassageLikes.query.filter_by(passage_id=passage_id).all()
+    current_user_id = current_user.user_id
+    
+    passage_id = models.PostIDs.query.filter_by(post_id=post_id).first().passage_id
+    
+    is_passage = True
+    
+    if passage_id == -1:
+        is_passage = False
+        comment_id = models.PostIDs.query.filter_by(post_id=post_id).first().comment_id
+        
+        post_likes_data_list = DB.session.query(models.CommentLikes,
+                                                models.Users
+                                                ).join(
+                                                    models.Users,
+                                                    models.Users.user_id == models.CommentLikes.user_id
+                                                ).filter(models.CommentLikes.comment_id==comment_id).all()
+                                                
+        return render_template('user-id-push-like.html',
+                               post_likes_data_list=post_likes_data_list,
+                               current_user_id=current_user_id,
+                               is_passage=is_passage
+                               )
+    
+    post_likes_data_list = DB.session.query(models.PassageLikes,
+                                            models.Users
+                                            ).join(
+                                                models.Users,
+                                                models.Users.user_id == models.PassageLikes.user_id
+                                            ).filter(models.PassageLikes.passage_id==passage_id).all()
     
     return render_template('user-id-push-like.html',
-                           passage_likes_data_list=passage_likes_data_list
+                           post_likes_data_list=post_likes_data_list,
+                           current_user_id=current_user_id,
+                           is_passage=is_passage
                            )
 
 

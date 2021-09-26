@@ -58,7 +58,7 @@
                         <form action="/passage/{{ passage_data.Passages.passage_id }}/push-like" method="POST">
                             <button type="submit"><i class="far fa-heart m-r-5"></i></button>
                         </form>
-                        <a class="c-110-110-110-hover" href="/passage/{{ passage_data.Passages.passage_id }}/likes">{{ passage_like_sum }}</a>
+                        <a class="c-110-110-110-hover" href="/post/{{ passage_data.PostIDs.post_id }}/likes">{{ passage_like_sum }}</a>
                     </div>
                     <div class="w-16per">
                         <a class="c-110-110-110-hover" href="/comment/{{ passage_data.PostIDs.post_id }}">コメント</a>
