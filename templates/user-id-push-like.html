@@ -12,10 +12,16 @@
     <div class="wrapper d-f">
         {% include 'left-column.html' %}
         <div class="w-40per m-l-5per m-r-5per">
-        {% for passage_likes_data in passage_likes_data_list %}
+            {% for post_likes_data in post_likes_data_list %}
+            {% if is_passage == True %}
             <div>
-                <a href="/user/{{ passage_likes_data.PassageLikes.user_id }}">{{ passage_likes_data.Users.user_name }}</a>
+                <a href="/user/{{ post_likes_data.Users.user_id }}">{{ post_likes_data.Users.user_name }}</a>
             </div>
+            {% else %}
+            <div>
+                <a href="/user/{{ post_likes_data.Users.user_id }}">{{ post_likes_data.Users.user_name }}</a>
+            </div>
+            {% endif %}
         {% endfor %}
         </div>
     </div>
