@@ -4,13 +4,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/passage_and_comment.css">
+    <link rel="stylesheet" href="/static/css/destyle.css">
     <title>いいねした人のid一覧 | ブクエモ！</title>
 </head>
 <body>
-    {% for passage_likes_data in passage_likes_data_list %}
-        <div>
-            <span>{{ passage_likes_data.user_id }}</span>
+    <div class="wrapper d-f">
+        {% include 'left-column.html' %}
+        <div class="w-40per m-l-5per m-r-5per">
+        {% for passage_likes_data in passage_likes_data_list %}
+            <div>
+                <a href="/user/{{ passage_likes_data.PassageLikes.user_id }}">{{ passage_likes_data.Users.user_name }}</a>
+            </div>
+        {% endfor %}
         </div>
-    {% endfor %}
+    </div>
 </body>
 </html>

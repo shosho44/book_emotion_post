@@ -204,9 +204,13 @@ def push_like_button_passage(passage_id, parent_post_id=-1):
 def show_user_push_good(passage_id=''):
     if current_user.is_authenticated is False:
         return redirect(url_for('signin'))
-    
-    passage_likes_data_list = models.PassageLikes.query.filter_by(passage_id=passage_id).all()
-    
+    passage_likes_data_list =  DB.session.query(models.PassageLikes,
+                                                models.Users
+                                                ).join(
+                                                    models.Users,
+                                                    models.Users.user_id == models.PassageLikes.user_id
+                                                )
+                                                
     return render_template('user-id-push-like.html',
                            passage_likes_data_list=passage_likes_data_list
                            )
