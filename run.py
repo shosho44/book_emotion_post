@@ -5,6 +5,7 @@ from flask import Flask, render_template, url_for, redirect, request
 from flask_login import current_user, login_user, logout_user, login_required
 import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
+from cryptography.fernet import Fernet
 
 import config
 from model import models
@@ -90,14 +91,19 @@ def signup_confirm():
     password = request.form['password']
     
     is_user_exist = models.Users.query.filter_by(email_address=email_address).first()
-    if is_user_exist:
+    if is_user_exist or user_id == '' or user_name == '' or email_address == '' or password == '':
         return redirect(url_for('signup'))
+    
+    key = b'6NpAoIihGtar-gthg9eExg0yKFxBEHkvldg9epEkwg8='  # 変更する必要あり。環境変数に入れよう
+    fernet = Fernet(key)
+    encryptec_email_address = fernet.encrypt(email_address.encode())
+    print(encryptec_email_address)
     
     insert_user_data = models.Users(
         user_id=user_id,
         password=generate_password_hash(password, method='sha256'),
         user_name=user_name,
-        email_address=email_address,
+        email_address=encryptec_email_address,
         created_at=datetime.datetime.now()
     )
     
