@@ -10,14 +10,14 @@
     <title>ブクエモ！</title>
 </head>
 <body>
-    <div class="wrapper flex">
+    <div class="flex">
         {% include 'left-column.html' %}
         <div class="w-6/12">
             <div class="mx-auto my-0 w-10/12">
                 {% for passage_information, passage_like_sum in ziped_list %}
                 <div class="bg-blue-100 rounded-lg mt-2.5 mb-2.5">
-                    <div class="passage m-auto py-4">
-                        <div class="break-all passage__item ml-auto mr-auto w-96">
+                    <div class="m-auto py-4">
+                        <div class="break-all ml-auto mr-auto w-96">
                             <p>{{ passage_information.Passages.passage_content }}</p>
                         </div>
                     </div>
@@ -27,7 +27,7 @@
                     <div class="flex m-auto w-96">
                         <span class="border-b border-black w-96 my-1.5"></span>
                     </div>
-                    <div class="flex m-auto p-b-5 w-96 break-all">
+                    <div class="flex m-auto pb-1.5 w-96 break-all">
                         <div class="w-5/12">
                             <a class="hover:text-gray-50" href="/user/{{ passage_information.Users.user_id }}">{{ passage_information.Users.user_name }}</a>
                         </div>
@@ -37,7 +37,7 @@
                             </form>
                             <a class="hover:text-gray-50" href="/post/{{ passage_information.PostIDs.post_id }}/likes">{{ passage_like_sum }}</a>
                         </div>
-                        <div class="w-2/12r">
+                        <div class="w-2/12">
                             <a class="hover:text-gray-50" href="/comment/{{ passage_information.PostIDs.post_id }}">コメント</a>
                         </div>
                         <div class="text-right w-2/12">
@@ -45,7 +45,7 @@
                             <form action="/passage/{{ passage_information.Passages.passage_id }}/delete" method="POST">
                                 <button type="submit"><i class="fas fa-trash"></i></button>
                             </form>
-                        {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
