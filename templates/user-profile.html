@@ -19,19 +19,19 @@
                         <div>
                             <img class="h-28 w-28" src="data:image/png;base64, {{ user_image }}">
                         </div>
-                        <div class="m-l-5 w-400 w-b-b-a">
-                            <div class="t-a-r">
+                        <div class="ml-1.5 w-96 break-all">
+                            <div class="text-right">
                                 {% if is_current_user_equal_profile_user == True %}
-                                <a class="c-110-110-110-hover" href="/user/{{ user.user_id }}/edit">プロフィールを編集する</a>
+                                <a class="hover:text-gray-50" href="/user/{{ user.user_id }}/edit">プロフィールを編集する</a>
                                 {% endif %}
                             </div>
                             <div>
-                                <span class="f-s-30 f-w-700">{{ user.user_name }}</span>
+                                <span class="text-3xl font-bold">{{ user.user_name }}</span>
                             </div>
                             <div>
                                 <span>@{{ user.user_id }}</span>
                             </div>
-                            <div class="d-f w-400 w-b-b-a">
+                            <div class="flex w-96 break-all">
                                 <span>{{ user.self_introduction }}</span>
                             </div>
                         </div>
