@@ -1,0 +1,5 @@
+# coding: UTF-8
+SQLALCHEMY_DATABASE_URI = 'sqlite:///bukuemo.db'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+APPLICATION_ROOT = '/'
+SECRET_KEY = 'secret'
