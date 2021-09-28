@@ -90,14 +90,13 @@ def signup_confirm():
     email_address = request.form['email_address']
     password = request.form['password']
     
-    is_user_exist = models.Users.query.filter_by(email_address=email_address).first()
-    if is_user_exist or user_id == '' or user_name == '' or email_address == '' or password == '':
-        return redirect(url_for('signup'))
-    
     key = b'6NpAoIihGtar-gthg9eExg0yKFxBEHkvldg9epEkwg8='  # 変更する必要あり。環境変数に入れよう
     fernet = Fernet(key)
     encryptec_email_address = fernet.encrypt(email_address.encode())
-    print(encryptec_email_address)
+    
+    is_user_exist = models.Users.query.filter_by(email_address=encryptec_email_address).first()
+    if is_user_exist or user_id == '' or user_name == '' or email_address == '' or password == '':
+        return redirect(url_for('signup'))
     
     insert_user_data = models.Users(
         user_id=user_id,
