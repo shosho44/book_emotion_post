@@ -4,25 +4,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/logout.css">
     <link rel="stylesheet" href="/static/css/destyle.css">
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/8e5cd391ff.js" crossorigin="anonymous"></script>
     <title>ログアウト | ブクエモ！</title>
 </head>
 <body>
-    <div class="bg-c-104-104-104 d-f f-center h-100v w-100v">
-        <div class="b-r-10 h-250 w-250" style="background-color: white;">
-            <div class="d-f f-center h-50per f-center">
-                <h1 class="t-a-c">ログアウトしますか？</h1>
+    <div class="bg-gray-300 flex items-center justify-center h-screen w-screen">
+        <div class="bg-white rounded-lg h-72 w-72">
+            <div class="flex items-center justify-center h-4/6">
+                <h1 class="text-center">ログアウトしますか？</h1>
             </div>
-            <div class="d-f h-40per f-center" style="justify-content: space-around;">
-                <div class="b-r-5 w-45per">
+            <div class="flex h-2/6 justify-around">
+                <div class="rounded-lg w-5/12">
                     <form action="/run-logout" method="POST">
-                        <button class="bg-c-150-150-150 b-r-10 p-b-10per p-t-10per t-a-c w-100per" type="submit">はい</button>
+                        <button class="bg-gray-600 rounded-lg py-1.5 text-center w-full" type="submit">はい</button>
                     </form>
                 </div>
-                <div class="b-r-5 w-45per">
-                    <a href="/user/{{ user_id }}"><p class="bg-c-224-224-224 b-r-10 p-b-10per p-t-10per t-a-c">いいえ</p></a>
+                <div class="rounded-lg w-5/12">
+                    <a href="/user/{{ user_id }}"><p class="bg-gray-300 rounded-lg py-1.5 text-center">いいえ</p></a>
                 </div>
             </div>
         </div>

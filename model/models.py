@@ -89,7 +89,7 @@ class Users(DB.Model):
     user_id = DB.Column(DB.String(128), nullable=False, primary_key=True)
     password = DB.Column(DB.String(128), nullable=False)
     user_name = DB.Column(DB.String(128), nullable=False)
-    email_address = DB.Column(DB.String(128), nullable=False)
+    email_address = DB.Column(DB.LargeBinary, nullable=False)
     self_introduction = DB.Column(DB.String(128), nullable=False, default='')
     user_image = DB.Column(DB.LargeBinary, nullable=False, default=default_user_image_base64)
     created_at = DB.Column(DB.DateTime, nullable=False)
