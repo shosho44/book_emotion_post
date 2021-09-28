@@ -7,7 +7,7 @@ import flask_login
 from werkzeug.security import generate_password_hash, check_password_hash
 from cryptography.fernet import Fernet
 
-from bukuemo.models import Comments, CommentLikes, Passages, PassageCommentRelations, PassageLikes, PostIDs, UserLoginInformation, Users
+from bukuemo.models import Comments, CommentLikes, Passages, PostCommentRelations, PassageLikes, PostIDs, UserLoginInformation, Users
 from bukuemo import app, db
 
 login_manager = flask_login.LoginManager()
@@ -138,7 +138,7 @@ def post_passage():
     db.session.add(insert_post_IDs_data)
     db.session.commit()
     
-    insert_passage_coments_relations_data = PassageCommentRelations(parent_id=insert_post_IDs_data.post_id)
+    insert_passage_coments_relations_data = PostCommentRelations(parent_id=insert_post_IDs_data.post_id)
     
     db.session.add(insert_passage_coments_relations_data)
     db.session.commit()
@@ -150,8 +150,8 @@ def post_passage():
 def delete_passage(passage_id=''):
     post_id = PostIDs.query.filter_by(passage_id=passage_id).first().post_id
     
-    PassageCommentRelations.query.filter_by(parent_id=post_id).delete()
-    PassageCommentRelations.query.filter_by(child_id=post_id).delete()
+    PostCommentRelations.query.filter_by(parent_id=post_id).delete()
+    PostCommentRelations.query.filter_by(child_id=post_id).delete()
     PassageLikes.query.filter_by(passage_id=passage_id).delete()
     
     delete_passage_data = db.session.query(Passages).filter_by(passage_id=passage_id).first()
@@ -366,20 +366,20 @@ def show_posts(post_id):
     parent_post_id = post_id
     
     child_data_table = db.session.query(Comments,
-                                        PassageCommentRelations,
+                                        PostCommentRelations,
                                         PostIDs,
                                         Users
                                         ).join(
                                             PostIDs,
                                             Comments.comment_id == PostIDs.comment_id
                                             ).join(
-                                                PassageCommentRelations,
-                                                PostIDs.post_id == PassageCommentRelations.child_id
+                                                PostCommentRelations,
+                                                PostIDs.post_id == PostCommentRelations.child_id
                                             ).join(
                                                 Users,
                                                 Comments.user_id == Users.user_id
                                                 )
-    child_data_list = child_data_table.filter(PassageCommentRelations.parent_id == parent_post_id).order_by(Comments.created_at.desc()).all()
+    child_data_list = child_data_table.filter(PostCommentRelations.parent_id == parent_post_id).order_by(Comments.created_at.desc()).all()
     
     child_like_sum_list = []
     
@@ -464,7 +464,7 @@ def post_comment(parent_post_id):
     db.session.add(insert_post_ID_data)
     db.session.commit()
     
-    insert_comment_relation_data = PassageCommentRelations(
+    insert_comment_relation_data = PostCommentRelations(
         parent_id=parent_post_id,
         child_id=insert_post_ID_data.post_id
     )
@@ -512,8 +512,8 @@ def push_like_button_comment(post_id, parent_post_id):
 def delete_comment(comment_id, parent_post_id=-1):
     post_id = PostIDs.query.filter_by(comment_id=comment_id).first().post_id
     
-    PassageCommentRelations.query.filter_by(parent_id=post_id).delete()
-    PassageCommentRelations.query.filter_by(child_id=post_id).delete()
+    PostCommentRelations.query.filter_by(parent_id=post_id).delete()
+    PostCommentRelations.query.filter_by(child_id=post_id).delete()
     CommentLikes.query.filter_by(comment_id=comment_id).delete()
     
     delete_passage_data = db.session.query(Comments).filter_by(comment_id=comment_id).first()

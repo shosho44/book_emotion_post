@@ -21,8 +21,8 @@ def test_table_exists():
         print('error: {}'.format(e))
     
     try:
-        models.PassageCommentRelations.query.all()
-        print('models.PassageCommentRelations exists')
+        models.PostCommentRelations.query.all()
+        print('models.PostCommentRelations exists')
     except Exception as e:
         print('error: {}'.format(e))
     

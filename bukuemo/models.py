@@ -40,11 +40,11 @@ class Passages(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
 
 
-class PassageCommentRelations(db.Model):
+class PostCommentRelations(db.Model):
     
-    __tablename__ = 'passage_comments_relations'
+    __tablename__ = 'post_comment_relations'
     
-    passage_comment_relation_id = db.Column(db.Integer, primary_key=True)
+    post_comment_relation_id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('post_IDs.post_id'), nullable=False)
     child_id = db.Column(db.Integer, db.ForeignKey('post_IDs.post_id'), nullable=False, default=-1)  # -1の時はchild_idとなるべきものがない場合
 

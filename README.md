@@ -9,3 +9,8 @@
 | SQLAlchemy | sqliteとやり取り, ログイン情報管理, 開発の効率化のため |  
 | pylance, flake8 | コード解析, コードフォーマットのため |  
 | gunicorn | NginxとFlaskを接続, リソース消費が少ないため |  
+| tailwind css | 拡張性が高いため |  
+
+# データベースモデル
+*が多になっています。
+https://user-images.githubusercontent.com/80147523/135138552-9c58b99c-8d36-4813-8e84-15f9e70d6ed3.png
