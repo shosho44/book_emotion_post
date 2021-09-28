@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/passage_and_comment.css">
     <link rel="stylesheet" href="/static/css/destyle.css">
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <title>いいねした人のid一覧 | ブクエモ！</title>
 </head>
 <body>
-    <div class="wrapper d-f">
+    <div class="flex">
         {% include 'left-column.html' %}
-        <div class="w-40per m-l-5per m-r-5per">
+        <div class="w-2/5 ml-1.5 mr-1.5">
             {% for post_likes_data in post_likes_data_list %}
             {% if is_passage == True %}
             <div>
