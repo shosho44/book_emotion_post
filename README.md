@@ -13,4 +13,4 @@
 
 # データベースモデル
 *が多になっています。
-https://user-images.githubusercontent.com/80147523/135138552-9c58b99c-8d36-4813-8e84-15f9e70d6ed3.png
+https://user-images.githubusercontent.com/80147523/135416751-f5e85188-8a9d-4247-a376-de4f45159b8f.png
