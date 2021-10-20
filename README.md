@@ -1,6 +1,6 @@
 # 概要
 本を読んでいて感動した文章を投稿するwebサイト  
-ブクエモ！：https://powerful-meadow-04553.herokuapp.com/  
+ブクエモ！：https://powerful-meadow-04553.herokuapp.com/signup  
 
 # 使用技術
 | 技術 | 採用理由・目的 |  
