@@ -92,6 +92,3 @@ class Users(db.Model):
     self_introduction = db.Column(db.String(128), nullable=False, default='')
     user_image = db.Column(db.LargeBinary, nullable=False, default=default_user_image_base64)
     created_at = db.Column(db.DateTime, nullable=False)
-
-def init():
-    db.create_all()
