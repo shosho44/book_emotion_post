@@ -1,16 +1,24 @@
-# 概要
-本を読んでいて感動した文章を投稿するwebサイト  
-ブクエモ！：https://powerful-meadow-04553.herokuapp.com/signup  
+# README
 
-# 使用技術
-| 技術 | 採用理由・目的 |  
-| ------------- | ------------- |  
-| Flask | ルーティング, テーブル定義, 軽量, カスタムがしやすいため |  
-| SQLAlchemy | sqliteとやり取り, ログイン情報管理, 開発の効率化のため |  
-| pylance, flake8 | コード解析, コードフォーマットのため |  
-| gunicorn | NginxとFlaskを接続, リソース消費が少ないため |  
-| tailwind css | 拡張性が高いため, クラス名を統一するため |  
+This README would normally document whatever steps are necessary to get the
+application up and running.
 
-# データベースモデル
-*が多になっています。
-https://user-images.githubusercontent.com/80147523/135416751-f5e85188-8a9d-4247-a376-de4f45159b8f.png
+Things you may want to cover:
+
+* Ruby version
+
+* System dependencies
+
+* Configuration
+
+* Database creation
+
+* Database initialization
+
+* How to run the test suite
+
+* Services (job queues, cache servers, search engines, etc.)
+
+* Deployment instructions
+
+* ...
