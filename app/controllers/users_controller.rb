@@ -16,12 +16,17 @@ class UsersController < ApplicationController
     end
   end
 
-  def updated
-    @user = User.find(params[:id])
+  def update_name_self_introduction
+    @user = User.find_by(user_id: params[:id])
+    if @user.update(user_update_name_self_introduction_params)
+      redirect_to user_path(@user.user_id)
+    else
+      render 'edit'
+    end
   end
 
   def edit
-    @user = User.find(params[:id])
+    @user = User.find_by(user_id: params[:id])
   end
 
   def destroy
@@ -31,5 +36,9 @@ class UsersController < ApplicationController
   # TODO: 変更する必要あり
   def user_params
     params.require(:user).permit(:user_id, :name, :email, :password, :password_confirmation)
+  end
+
+  def user_update_name_self_introduction_params
+    params.require(:user).permit(:name, :self_introduction)
   end
 end

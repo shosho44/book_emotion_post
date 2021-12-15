@@ -11,8 +11,8 @@
                     <div class="ml-1.5 w-96 break-all">
                         <div class="text-right">
                             <!--{% if is_current_user_equal_profile_user == True %}-->
-                            <!--Todo: 直下href先変更する。表示しているプロフィールがオーナーかどうかの判定をつける-->
-                            <a class="hover:text-gray-50" href="/user/{{ user.user_id }}/edit">プロフィールを編集する</a>
+                            <!--Todo: 表示しているプロフィールがオーナーかどうかの判定をつける-->
+                            <%= link_to 'プロフィールを編集する', edit_user_url %>
                             <!--{% endif %}-->
                         </div>
                         <div>

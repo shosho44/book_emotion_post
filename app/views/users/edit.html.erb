@@ -1,0 +1,31 @@
+<div>
+  <!--Todo: 直下href先変更する。画像の保存先によってupdate先のurlが変わる。画像の保存先を決めた後に取り組む-->
+  <a href="{{ url_for('show_edit_user_image', user_id=current_user_id)}}">
+    <button type="submit">
+      <img src="data:image/png;base64, {{ user_image }}" width="150px" height="150px">
+    </button>
+  </a>
+</div>
+<div class="flex items-center justify-center">
+  <div class="flex items-center justify-center rounded-md h-96 w-72">
+    <div class="mx-1/5">
+      <div class="flex items-center justify-center">
+        <div class="w-5/5">
+          <%= form_with(model: @user, url: {controller: 'users', action: 'update_name_self_introduction'}, local: true) do |f| %>
+          <%= f.label :name, 'ユーザー名' %>
+          <%= f.text_field :name, class: 'bg-white rounded-md h-7 mb-1.5 pl-2.5 w-full border-solid border-2 border-yellow-600', placeholder: 'ユーザー名' %>
+
+          <%= f.label :self_introduction, '自己紹介' %>
+          <%= f.text_area :self_introduction, class: 'bg-white rounded-md h-16 mb-1.5 pl-2.5 w-full border-solid border-2 border-yellow-600', placeholder: '自己紹介' %>
+
+          <div class="flex items-center justify-center mt-1.5">
+            <div class="rounded-md bg-yellow-600 h-7 w-4/5 hover:bg-yellow-500">
+              <%= f.submit "更新する", class: 'text-center h-7 w-full' %>
+            </div>
+          </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
