@@ -1,1 +1,40 @@
-this is new account form page
+<div class="fixed" style="z-index: -1;">
+  <!--Todo: 直下srcを変更する。画像の保存先を決めた後-->
+  <img class="w-full" src="../static/img/login_background.png">
+</div>
+<div class="flex items-center justify-center h-screen">
+  <div class="flex items-center justify-center rounded-md h-96 w-72 bg-yellow-200">
+    <div class="my-auto mx-1/5">
+      <div class="mb-7 text-center">
+        <h1 class="text-4xl font-bold">ブクエモ！</h1>
+        <p class="text-base">心揺さぶる文章がここにある</p>
+      </div>
+
+      <div class="flex items-center justify-center">
+        <div class="w-4/5">
+          <%= form_with(model: @user, local: true) do |f| %>
+          <%= f.text_field :user_id, class: 'bg-white rounded-md h-7 mb-1.5 pl-2.5 w-full', placeholder: 'id' %>
+
+          <%= f.text_field :name, class: 'bg-white rounded-md h-7 mb-1.5 pl-2.5 w-full', placeholder: 'ユーザー名' %>
+
+          <%= f.email_field :email, class: 'bg-white rounded-md h-7 mb-1.5 pl-2.5 w-full', placeholder: 'Eメール' %>
+
+          <%= f.password_field :password, class: 'bg-white rounded-md h-7 mb-1.5 pl-2.5 w-full', placeholder: 'パスワード' %>
+
+          <%= f.password_field :password_confirmation, class: 'bg-white rounded-md h-7 mb-1.5 pl-2.5 w-full', placeholder: 'パスワード確認用' %>
+
+          <div class="flex items-center justify-center mt-1.5">
+            <div class="rounded-md bg-yellow-600 h-7 w-4/5 hover:bg-yellow-500">
+              <%= f.submit "アカウントを作成する", class: 'text-center h-7 w-full' %>
+            </div>
+          </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="text-center mt-1.5">
+        <!--Todo: href先を変える。cookieのコントローラを作成した後。-->
+        <a class="hover:text-gray-400 text-xs" href="signin">ログインはこちら</a>
+      </div>
+    </div>
+  </div>
+</div>
