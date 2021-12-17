@@ -1,0 +1,23 @@
+<div class="block mr-0.5 ml-auto my-2.5 w-3/12">
+  <!-- Todo: 実際にdbに保存されているかの確認。user_idをcurrent_userのidに変更-->
+  <%= form_with(model: @passage, url: {controller: 'passages', action: 'create', user_id: 'test_user_1'}, local: true, class: "w-full") do |f| %>
+  <div class="m-auto w-11/12">
+    <%= f.text_area :content, placeholder: "感動した文章", class: "rounded-lg bg-gray-100 h-96 mt-2.5 py-1.5 pl-1.5 break-all w-full" %>
+
+    <%= f.text_area :book_title, placeholder: "本のタイトル", class: "rounded-lg bg-gray-100 mt-2.5 py-1.5 pl-1.5 w-full"%>
+
+    <%= f.submit "投稿する", class: "hover:text-gray-400 mt-2.5" %>
+  </div>
+  <% end %>
+  <!--
+  <form action="/post-passage" method="POST" class="w-full">
+    <div class="m-auto w-11/12">
+      <textarea type="text" placeholder="感動した文章" name="passage_content"
+        class="rounded-lg bg-gray-100 h-96 mt-2.5 py-1.5 pl-1.5 break-all w-full"></textarea>
+      <input type="text" placeholder="本のタイトル" name="book_title"
+        class="rounded-lg bg-gray-100 mt-2.5 py-1.5 pl-1.5 w-full">
+      <input class="hover:text-gray-400 mt-2.5" type="submit" value="投稿する">
+    </div>
+  </form>
+  -->
+</div>
