@@ -10,10 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_17_094447) do
+ActiveRecord::Schema.define(version: 2021_12_17_160215) do
+
+  create_table "comments", force: :cascade do |t|
+    t.string "user_id"
+    t.text "content"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "passages", force: :cascade do |t|
-    t.integer "user_id"
+    t.string "user_id", null: false
     t.string "book_title"
     t.string "content"
     t.datetime "created_at", precision: 6, null: false

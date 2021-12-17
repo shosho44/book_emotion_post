@@ -1,11 +1,16 @@
 class PassagesController < ApplicationController
   def create
+    puts passage_params
     @passage = Passage.new(passage_params)
     @passage.save
     redirect_to root_url
   end
 
   def show
+    @passage = Passage.find(params[:id])
+  end
+
+  def show_all
     @passage = Passage.new
     @passages = Passage.all.order(created_at: :desc).order(user_id: :asc)
   end
