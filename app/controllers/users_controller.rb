@@ -33,7 +33,8 @@ class UsersController < ApplicationController
     @user.destroy
   end
 
-  # TODO: 変更する必要あり
+  private
+
   def user_params
     params.require(:user).permit(:id, :name, :email, :password, :password_confirmation)
   end
