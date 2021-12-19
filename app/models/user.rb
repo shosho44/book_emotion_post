@@ -7,8 +7,8 @@ class User < ApplicationRecord
   validates :email, presence: true, length: { maximum: 255 }, format: { with: VALID_EMAIL_REGEX },
                     uniqueness: { case_sensitive: false }
 
-  VALID_USER_ID_REGEX = /[a-zA-Z0-9_-]+/
-  validates :user_id, presence: true, length: { maximum: 255 }, format: { with: VALID_USER_ID_REGEX }, uniqueness: true
+  VALID_ID_REGEX = /[a-zA-Z0-9_-]+/
+  validates :id, presence: true, length: { maximum: 255 }, format: { with: VALID_ID_REGEX }, uniqueness: true
 
   has_secure_password
   validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
