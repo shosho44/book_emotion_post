@@ -16,7 +16,7 @@
         </div>
         <div class="flex m-auto pb-1.5 w-96 break-all">
           <div class="w-5/12">
-            <%= link_to 'ユーザー名', user_path(:user_id) %>
+            <%= link_to 'ユーザー名', user_path(@passage.user_id) %>
             <!--Todo: ユーザー名を取得する必要がある-->
           </div>
           <div class="flex w-3/12">
@@ -38,13 +38,13 @@
         </div>
       </div>
 
-      <!--
+
       <div class="my-1.5">
-        {% for child_data, child_like_sum in child_data_and_like_sum_list %}
+        <%= @comments.each do |comment| %>
         <div class="bg-blue-100 rounded-lg mt-2.5 mb-2.5">
           <div class="m-auto py-4">
             <div class="break-all ml-auto mr-auto w-96">
-              <p>{{ child_data.Comments.comment_content }}</p>
+              <p><%= comment.content %></p>
             </div>
           </div>
           <div class="flex m-auto w-96">
@@ -52,10 +52,11 @@
           </div>
           <div class="flex m-auto pb-1.5 w-96 break-all">
             <div class="w-5/12">
-              <a class="hover:text-gray-400"
-                href="/user/{{ child_data.Comments.user_id }}">{{ child_data.Users.user_name }}</a>
+              <!--Todo: 直下ユーザー名をusersから取得する。commentsとjoinして-->
+              <%= link_to 'ユーザー名', user_path(comment.user_id), class: "hover:text-gray-400" %>
             </div>
             <div class="flex w-3/12">
+              <!--Todo: 直下いいねmvcが出来次第form_withで書き換える。いいね数も-->
               <form action="/comment/{{ child_data.PostIDs.post_id }}/push-like/{{ parent_post_id }}" method="POST">
                 <button type="submit"><i class="far fa-heart m-r-5"></i></button>
               </form>
@@ -63,20 +64,19 @@
                 href="/post/{{ child_data.PostIDs.post_id }}/likes">{{ child_like_sum }}</a>
             </div>
             <div class="w-2/12">
-              <a class="hover:text-gray-400" href="/comment/{{ child_data.PostIDs.post_id }}">コメント</a>
+              <%= link_to 'コメント', user_comment_path(user_id: comment.user_id, id: comment.id), class: "hover:text-gray-400"%>
             </div>
+            <!--Todo: コメントのオーナーがcurrent_userと同じか判定する
+            {% if child_data.Comments.user_id == current_user_id %}-->
             <div class="text-right w-2/12">
-              {% if child_data.Comments.user_id == current_user_id %}
-              <form action="/comment/{{ child_data.Comments.comment_id }}/delete/{{ parent_post_id }}" method="POST">
-                <button type="submit"><i class="fas fa-trash"></i></button>
-              </form>
-              {% endif %}
+              <%= link_to user_comment_path(user_id: comment.user_id, id: comment.id), method: :delete do %>
+              <i class="fas fa-trash"></i>
+              <% end %>
             </div>
           </div>
         </div>
-        {% endfor %}
+        <% end %>
       </div>
-      -->
     </div>
   </div>
   <%= render 'shared/comment_form' %>

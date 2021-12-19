@@ -1,4 +1,7 @@
 class Passage < ApplicationRecord
+  belongs_to :user
+  has_many :passage_comment_relations
+
   validates :content, presence: true, length: { maximum: 1023 }
 
   validates :book_title, length: { maximum: 255 }

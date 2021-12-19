@@ -8,6 +8,8 @@ class PassagesController < ApplicationController
 
   def show
     @passage = Passage.find(params[:id])
+    @comment = Comment.new
+    @comments = PassagesCommentRelation.find_by(passage_id: params[:id]) # TODO: ここ間違ってる。するべきはPassageとCommentとPassagesCommentRelationを組み合わせてcontentを取得する
   end
 
   def show_all
