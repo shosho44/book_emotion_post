@@ -1,5 +1,6 @@
 class PassagesController < ApplicationController
   def create
+    puts '#' * 40
     puts passage_params
     @passage = Passage.new(passage_params)
     @passage.save
