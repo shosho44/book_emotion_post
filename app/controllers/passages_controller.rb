@@ -1,7 +1,5 @@
 class PassagesController < ApplicationController
   def create
-    puts '#' * 40
-    puts passage_params
     @passage = Passage.new(passage_params)
     @passage.save
     redirect_to root_url
@@ -10,7 +8,7 @@ class PassagesController < ApplicationController
   def show
     @passage = Passage.find(params[:id])
     @comment = Comment.new
-    @comments = PassagesCommentRelation.find_by(passage_id: params[:id]) # TODO: ここ間違ってる。するべきはPassageとCommentとPassagesCommentRelationを組み合わせてcontentを取得する
+    @comments = Passage.joins(passages_comment_relations: :comment).select('comments.*').where(passages: { id: params[:id] })
   end
 
   def show_all
