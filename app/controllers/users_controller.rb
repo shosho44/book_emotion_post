@@ -5,6 +5,7 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    @passages = Passage.where(user_id: params[:id])
   end
 
   def create
