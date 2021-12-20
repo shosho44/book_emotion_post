@@ -10,24 +10,45 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_17_094447) do
+ActiveRecord::Schema.define(version: 2021_12_19_140314) do
+
+  create_table "comments", force: :cascade do |t|
+    t.text "content", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "user_id", null: false
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
 
   create_table "passages", force: :cascade do |t|
-    t.integer "user_id"
-    t.string "book_title"
-    t.string "content"
+    t.string "book_title", default: "不明", null: false
+    t.text "content", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "user_id", null: false
+    t.index ["user_id"], name: "index_passages_on_user_id"
   end
 
-  create_table "users", force: :cascade do |t|
-    t.string "user_id"
-    t.string "name"
-    t.string "email"
+  create_table "passages_comment_relations", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "passage_id", null: false
+    t.integer "comment_id", null: false
+    t.index ["comment_id"], name: "index_passages_comment_relations_on_comment_id"
+    t.index ["passage_id"], name: "index_passages_comment_relations_on_passage_id"
+  end
+
+  create_table "users", id: :string, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "email", null: false
     t.string "self_introduction"
-    t.string "password_digest"
+    t.string "password_digest", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "comments", "users"
+  add_foreign_key "passages", "users"
+  add_foreign_key "passages_comment_relations", "comments"
+  add_foreign_key "passages_comment_relations", "passages"
 end

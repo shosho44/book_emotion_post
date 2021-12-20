@@ -2,61 +2,82 @@
   <%= render 'shared/left_column' %>
   <div class="w-6/12">
     <div class="mx-auto my-0 w-10/12">
-      <!-- Todo: user nameを取得して入れる。いいね数を取得して入れる。いいね数テーブルとusersとpassagesをjoinしたものを回す-->
-      <% @passages.each do |passage|%>
-      <!--{% for passage_information, passage_like_sum in ziped_list %}-->
       <div class="bg-blue-100 rounded-lg mt-2.5 mb-2.5">
         <div class="m-auto py-4">
           <div class="break-all ml-auto mr-auto w-96">
-            <p><%= passage.content %></p>
-            <!--<p>{{ passage_information.Passages.passage_content }}</p>-->
+            <p><%= @passage.content %></p>
           </div>
         </div>
         <div class="break-all m-auto w-96">
-          <span><i class="fas fa-book-open mr-1.5"></i><%= passage.book_title %></span>
+          <span><i class="fas fa-book-open mr-1.5"></i><%= @passage.book_title %></span>
         </div>
         <div class="flex m-auto w-96">
           <span class="border-b border-black w-96 my-1.5"></span>
         </div>
         <div class="flex m-auto pb-1.5 w-96 break-all">
           <div class="w-5/12">
-            <a class="hover:text-gray-50" href="/user/{{ passage_information.Users.user_id }}"><%= "ユーザー名" %></a>
-            <!-- Todo: user nameを取得して入れる。usersとpassagesをjoinしたものを回す。href変更-->
-            <!--<a class="hover:text-gray-50"
-              href="/user/{{ passage_information.Users.user_id }}">{{ passage_information.Users.user_name }}</a>-->
+            <%= link_to 'ユーザー名', user_path(@passage.user_id) %>
+            <!--Todo: ユーザー名を取得する必要がある-->
           </div>
           <div class="flex w-3/12">
-            <form action="/passage/{{ passage_information.Passages.passage_id }}/push-like" method="POST">
+            <!--Todo: 以下formをlink_toに書き直す。いいねのmvcを作り次第
+            <form action="/passage/{{ passage_id }}/push-like/{{ parent_post_id }}" method="POST">
               <button type="submit"><i class="far fa-heart mr-1.5"></i></button>
             </form>
-            <!-- Todo: いいね数を取得して入れる。いいね数モデルとpassagesをjoinしたものを回す-->
-            <a class="hover:text-gray-50"
-              href="/post/{{ passage_information.PostIDs.post_id }}/likes"><%= 'いいね数（栞の数）' %></a>
-            <!--<a class="hover:text-gray-50"
-              href="/post/{{ passage_information.PostIDs.post_id }}/likes">{{ passage_like_sum }}</a>-->
+            <a class="hover:text-gray-400" href="/post/{{ parent_post_id }}/likes">{{ parent_like_sum }}</a>
+            -->
           </div>
-          <div class="w-2/12">
-            <a class="hover:text-gray-50" href="/comment/{{ passage_information.PostIDs.post_id }}">コメント</a>
-          </div>
-          <div class="text-right w-2/12">
-            <!--Todo: ユーザーの確認を行う-->
-            <!--{% if passage_information.Passages.user_id == current_user_id %}-->
-            <%= link_to user_passage_path(user_id: "test_user_1", id: passage.id), method: :delete do %>
+          <!-- Todo: passageのオーナーがcurrent_userかどうかの判定をつける
+          % if parent_user_id == current_user_id %}-->
+          <div class="text-right ml-auto w-2/12">
+            <%= link_to user_passage_path(user_id: "test_user_1", id: @passage.id), method: :delete do %>
             <i class="fas fa-trash"></i>
             <% end %>
-            <!--Todo: actionを変更する
-            <form action="/passage/{{ passage_information.Passages.passage_id }}/delete" method="POST">
-              <button type="submit"><i class="fas fa-trash"></i></button>
-            </form>
-            -->
-            <!--{% endif %}-->
           </div>
+          <!--{% endif %}-->
         </div>
       </div>
-      <% end %>
-      <!--{% endfor %}-->
+
+
+      <div class="my-1.5">
+        <% @comments.each do |comment| %>
+        <div class="bg-blue-100 rounded-lg mt-2.5 mb-2.5">
+          <div class="m-auto py-4">
+            <div class="break-all ml-auto mr-auto w-96">
+              <p><%= comment.content %></p>
+            </div>
+          </div>
+          <div class="flex m-auto w-96">
+            <span class="border-b border-black w-96 my-1.5"></span>
+          </div>
+          <div class="flex m-auto pb-1.5 w-96 break-all">
+            <div class="w-5/12">
+              <!--Todo: 直下ユーザー名をusersから取得する。commentsとjoinして-->
+              <%= link_to 'ユーザー名', user_path(comment.user_id), class: "hover:text-gray-400" %>
+            </div>
+            <div class="flex w-3/12">
+              <!--Todo: 直下いいねmvcが出来次第form_withで書き換える。いいね数も-->
+              <form action="/comment/{{ child_data.PostIDs.post_id }}/push-like/{{ parent_post_id }}" method="POST">
+                <button type="submit"><i class="far fa-heart m-r-5"></i></button>
+              </form>
+              <a class="hover:text-gray-400"
+                href="/post/{{ child_data.PostIDs.post_id }}/likes">{{ child_like_sum }}</a>
+            </div>
+            <div class="w-2/12">
+              <%= link_to 'コメント', user_comment_path(user_id: comment.user_id, id: comment.id), class: "hover:text-gray-400"%>
+            </div>
+            <!--Todo: コメントのオーナーがcurrent_userと同じか判定する
+            {% if child_data.Comments.user_id == current_user_id %}-->
+            <div class="text-right w-2/12">
+              <%= link_to user_comment_path(user_id: comment.user_id, id: comment.id), method: :delete do %>
+              <i class="fas fa-trash"></i>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <% end %>
+      </div>
     </div>
   </div>
-  <%= render 'shared/passage_form' %>
-  <!--{% include 'right-column.html' %}-->
+  <%= render 'shared/comment_form' %>
 </div>
