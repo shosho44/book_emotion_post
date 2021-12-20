@@ -8,7 +8,7 @@ class PassagesController < ApplicationController
   def show
     @passage = Passage.find(params[:id])
     @comment = Comment.new
-    @comments = Passage.joins(passages_comment_relations: :comment).select('comments.*').where(passages: { id: params[:id] })
+    @comments = Passage.joins(passages_comment_relations: :comment).select('comments.*').where(passages: { id: params[:id] }).order('comments.created_at desc').order('comments.user_id asc')
   end
 
   def show_all
