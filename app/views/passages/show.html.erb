@@ -16,8 +16,7 @@
         </div>
         <div class="flex m-auto pb-1.5 w-96 break-all">
           <div class="w-5/12">
-            <%= link_to 'ユーザー名', user_path(@passage.user_id) %>
-            <!--Todo: ユーザー名を取得する必要がある-->
+            <%= link_to @passage.user_name, user_path(@passage.user_id) %>
           </div>
           <div class="flex w-3/12">
             <!--Todo: 以下formをlink_toに書き直す。いいねのmvcを作り次第
@@ -40,7 +39,7 @@
 
 
       <div class="my-1.5">
-        <% @comments.each do |comment| %>
+        <% @comments.zip(@comments_likes).each do |comment, comment_likes| %>
         <div class="bg-blue-100 rounded-lg mt-2.5 mb-2.5">
           <div class="m-auto py-4">
             <div class="break-all ml-auto mr-auto w-96">
@@ -52,8 +51,7 @@
           </div>
           <div class="flex m-auto pb-1.5 w-96 break-all">
             <div class="w-5/12">
-              <!--Todo: 直下ユーザー名をusersから取得する。commentsとjoinして-->
-              <%= link_to 'ユーザー名', user_path(comment.user_id), class: "hover:text-gray-400" %>
+              <%= link_to comment.user_name, user_path(comment.user_id), class: "hover:text-gray-400" %>
             </div>
             <div class="flex w-3/12">
               <!--Todo: 直下いいねmvcが出来次第form_withで書き換える。いいね数も-->
@@ -61,7 +59,7 @@
                 <button type="submit"><i class="far fa-heart m-r-5"></i></button>
               </form>
               <a class="hover:text-gray-400"
-                href="/post/{{ child_data.PostIDs.post_id }}/likes">{{ child_like_sum }}</a>
+                href="/post/{{ child_data.PostIDs.post_id }}/likes"><%= comment_likes %></a>
             </div>
             <div class="w-2/12">
               <%= link_to 'コメント', user_comment_path(user_id: comment.user_id, id: comment.id), class: "hover:text-gray-400"%>

@@ -6,14 +6,22 @@ class PassagesController < ApplicationController
   end
 
   def show
-    @passage = Passage.find(params[:id])
+    @passage = User.joins(:passages).where(passages: { id: params[:id] }).select('users.name as user_name, passages.*').first
+    @passage_bookmarks = Passage.joins(:passage_bookmarks).where(passages: { id: params[:id] }).count
+
     @comment = Comment.new
-    @comments = Passage.joins(passages_comment_relations: :comment).select('comments.*').where(passages: { id: params[:id] }).order('comments.created_at desc').order('comments.user_id asc')
+    @comments = User.joins(passages: :comments).where(passages: { id: params[:id] })
+                    .select('users.id as user_id, users.name as user_name, comments.content as content, comments.id as id, passages.content as passge_content')
+                    .order('comments.created_at desc').order('comments.user_id asc')
+    @comments_likes_plus_one = Passage.joins(:comments).includes(comments: :comment_likes).where(passages: { id: params[:id] }).order('comments.created_at desc').order('comments.user_id asc').group(:comment_id).count
+    @comments_likes = @comments_likes_plus_one.map { |_key, value| value - 1 }
   end
 
   def show_all
     @passage = Passage.new
-    @passages = Passage.all.order(created_at: :desc).order(user_id: :asc)
+    @passages = User.joins(:passages).select('users.name as user_name, passages.*').order('passages.created_at desc').order('passages.user_id asc')
+    @passages_bookmarks_plus_one = Passage.includes(:passage_bookmarks).order('passages.created_at desc').order('passages.user_id asc').group('passages.id').count
+    @passages_bookmarks = @passages_bookmarks_plus_one.map { |_key, value| value - 1 }
   end
 
   def destroy
