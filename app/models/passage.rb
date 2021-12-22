@@ -1,6 +1,7 @@
 class Passage < ApplicationRecord
   belongs_to :user
   has_many :passages_comment_relations
+  has_many :comments, through: :passages_comment_relations
   has_many :passage_bookmarks
 
   validates :content, presence: true, length: { maximum: 1023 }

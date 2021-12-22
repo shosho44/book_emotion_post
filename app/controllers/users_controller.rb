@@ -5,7 +5,9 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
-    @passages = Passage.where(user_id: params[:id])
+    @passages = User.joins(:passages).where(users: { id: params[:id] }).select('users.name as user_name, passages.*').order('passages.created_at desc').order('passages.user_id asc')
+    @passages_bookmarks_plus_one = Passage.includes(:passage_bookmarks).order('passages.created_at desc').order('passages.user_id asc').group('passages.id').count
+    @passages_bookmarks = @passages_bookmarks_plus_one.map { |_key, value| value - 1 }
   end
 
   def create
