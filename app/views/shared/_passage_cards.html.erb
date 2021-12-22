@@ -19,7 +19,6 @@
       <form action="/passage/{{ passage_information.Passages.passage_id }}/push-like" method="POST">
         <button type="submit"><i class="far fa-heart mr-1.5"></i></button>
       </form>
-      <!-- Todo: いいね数を取得して入れる。いいね数モデルとpassagesをjoinしたものを回す-->
       <% puts passage.id.class %>
       <a class="hover:text-gray-50"
         href="/post/{{ passage_information.PostIDs.post_id }}/likes"><%= passage_bookmarks %></a>
