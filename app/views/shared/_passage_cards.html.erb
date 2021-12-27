@@ -16,10 +16,9 @@
       <%= link_to passage.user_name, user_path(passage.user_id), class: "hover:text-gray-50" %>
     </div>
     <div class="flex w-3/12">
-      <form action="/passage/{{ passage_information.Passages.passage_id }}/push-like" method="POST">
-        <button type="submit"><i class="far fa-heart mr-1.5"></i></button>
-      </form>
-      <% puts passage.id.class %>
+      <%= link_to "users/test_user_1/passages/#{passage.id}/bookmarks/check", method: :post do %>
+      <i class="far fa-heart mr-1.5"></i>
+      <% end %>
       <a class="hover:text-gray-50"
         href="/post/{{ passage_information.PostIDs.post_id }}/likes"><%= passage_bookmarks %></a>
       <!--<a class="hover:text-gray-50"
