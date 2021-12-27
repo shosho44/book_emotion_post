@@ -5,9 +5,13 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
-    @passages = User.joins(:passages).where(users: { id: params[:id] }).select('users.name as user_name, passages.*').order('passages.created_at desc').order('passages.user_id asc')
-    @passages_bookmarks_plus_one = Passage.includes(:passage_bookmarks).order('passages.created_at desc').order('passages.user_id asc').group('passages.id').count
-    @passages_bookmarks = @passages_bookmarks_plus_one.map { |_key, value| value - 1 }
+
+    @passages = User.joins(:passages).where(users: { id: params[:id] }).select('users.name as user_name, passages.*')
+                    .order('passages.created_at desc').order('passages.user_id asc')
+
+    @passages_bookmarks = Passage.eager_load(:passage_bookmarks).where(passages: { user_id: params[:id] })
+                                 .select('passages.id as passage_id').order('passages.created_at desc').order('passages.user_id asc')
+                                 .group('passages.id').count('passage_bookmarks.id').map { |_key, value| value }
   end
 
   def create
