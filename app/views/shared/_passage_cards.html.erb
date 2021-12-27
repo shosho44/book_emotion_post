@@ -16,7 +16,7 @@
       <%= link_to passage.user_name, user_path(passage.user_id), class: "hover:text-gray-50" %>
     </div>
     <div class="flex w-3/12">
-      <%= link_to "users/test_user_1/passages/#{passage.id}/bookmarks/check", method: :post do %>
+      <%= link_to user_passage_bookmarks_check_path(user_id: "test_user_1", passage_id: passage.id), method: :post do %>
       <i class="far fa-bookmark mr-1.5"></i>
       <% end %>
       <%= link_to passage_bookmarks, controller: "bookmarks", action: "show_passage_bookmarks", user_id: passage.user_id, passage_id: passage.id%>
