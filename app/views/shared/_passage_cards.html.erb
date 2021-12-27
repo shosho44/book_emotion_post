@@ -17,7 +17,7 @@
     </div>
     <div class="flex w-3/12">
       <%= link_to "users/test_user_1/passages/#{passage.id}/bookmarks/check", method: :post do %>
-      <i class="far fa-heart mr-1.5"></i>
+      <i class="far fa-bookmark mr-1.5"></i>
       <% end %>
       <a class="hover:text-gray-50"
         href="/post/{{ passage_information.PostIDs.post_id }}/likes"><%= passage_bookmarks %></a>
