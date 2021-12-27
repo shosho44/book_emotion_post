@@ -16,15 +16,10 @@
       <%= link_to passage.user_name, user_path(passage.user_id), class: "hover:text-gray-50" %>
     </div>
     <div class="flex w-3/12">
-      <form action="/passage/{{ passage_information.Passages.passage_id }}/push-like" method="POST">
-        <button type="submit"><i class="far fa-heart mr-1.5"></i></button>
-      </form>
-      <!-- Todo: いいね数を取得して入れる。いいね数モデルとpassagesをjoinしたものを回す-->
-      <% puts passage.id.class %>
-      <a class="hover:text-gray-50"
-        href="/post/{{ passage_information.PostIDs.post_id }}/likes"><%= passage_bookmarks %></a>
-      <!--<a class="hover:text-gray-50"
-              href="/post/{{ passage_information.PostIDs.post_id }}/likes">{{ passage_like_sum }}</a>-->
+      <%= link_to "users/test_user_1/passages/#{passage.id}/bookmarks/check", method: :post do %>
+      <i class="far fa-bookmark mr-1.5"></i>
+      <% end %>
+      <%= link_to passage_bookmarks, controller: "bookmarks", action: "show_passage_bookmarks", user_id: passage.user_id, passage_id: passage.id%>
     </div>
     <div class="w-2/12">
       <%= link_to 'コメント', user_passage_path(user_id: passage.user_id, id: passage.id), class: 'hover:text-gray-50' %>
