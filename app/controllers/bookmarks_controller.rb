@@ -1,6 +1,8 @@
 class BookmarksController < ApplicationController
   def show_passage_bookmarks
-    Passage.join(:passage_bookmarks)
+    @users_pushed_passage_bookmark = User.eager_load(:passage_bookmarks).where(passage_bookmarks: { passage_id: params[:passage_id] })
+                                         .select('passage_bookmarks.user_id as user_id, users.name as name')
+                                         .order('users.id asc')
   end
 
   def show; end

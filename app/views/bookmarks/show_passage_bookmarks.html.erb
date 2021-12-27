@@ -1,0 +1,10 @@
+<div class="flex">
+  <%= render 'shared/left_column' %>
+  <div class="w-2/5 ml-1.5 mr-1.5">
+    <% @users_pushed_passage_bookmark.each do |user_pushed_bookmark| %>
+    <div>
+      <%= link_to user_pushed_bookmark.name, user_path(user_pushed_bookmark.user_id) %></a>
+    </div>
+    <% end %>
+  </div>
+</div>
