@@ -1,6 +1,20 @@
 class CommentsController < ApplicationController
   def show
-    @comment = Comment.find(params[:id])
+    @comment_form_model = Comment.new
+
+    @comment = User.joins(:comments).where(comments: { id: params[:id] }).select('users.name as user_name, comments.*').first
+
+    @comment_like = Comment.eager_load(:comment_likes).where(comments: { id: params[:id] }).group('comments.id').count('comment_likes.id').map do |_key, value|
+      value
+    end
+
+    @comments = User.joins(:comments).eager_load(comments: :comments_relations).eager_load(comments: :comment_likes)
+                    .where(comments_relations: { parent_comment_id: 1 })
+                    .select('users.id as user_id, users.name as user_name, comments.content as content, comments.id as id')
+                    .order('comments.created_at desc').order('comments.user_id asc')
+
+    @comments_likes = Comment.joins(:passages_comment_relation).eager_load(:comment_likes)
+                             .where(passages_comment_relations: { passage_id: 1 }).group('comments.id').count('comment_likes.id')
   end
 
   def create

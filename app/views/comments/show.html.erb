@@ -1,0 +1,81 @@
+<div class="flex">
+  <%= render 'shared/left_column' %>
+  <div class="w-6/12">
+    <div class="mx-auto my-0 w-10/12">
+      <div class="bg-blue-100 rounded-lg mt-2.5 mb-2.5">
+        <div class="m-auto py-4">
+          <div class="break-all ml-auto mr-auto w-96">
+            <p><%= @comment.content %></p>
+          </div>
+        </div>
+        <div class="flex m-auto w-96">
+          <span class="border-b border-black w-96 my-1.5"></span>
+        </div>
+        <div class="flex m-auto pb-1.5 w-96 break-all">
+          <div class="w-5/12">
+            <%= link_to @comment.user_name, user_path(@comment.user_id) %>
+          </div>
+          <div class="flex w-3/12">
+            <div class="flex w-3/12">
+
+            </div>
+            <!--Todo: 以下formをlink_toに書き直す。いいねのmvcを作り次第
+            <form action="/passage/{{ passage_id }}/push-like/{{ parent_post_id }}" method="POST">
+              <button type="submit"><i class="far fa-heart mr-1.5"></i></button>
+            </form>
+            <a class="hover:text-gray-400" href="/post/{{ parent_post_id }}/likes">{{ parent_like_sum }}</a>
+            -->
+          </div>
+          <!-- Todo: commentのオーナーがcurrent_userかどうかの判定をつける
+          % if parent_user_id == current_user_id %}-->
+          <div class="text-right ml-auto w-2/12">
+            <%= link_to user_comment_path(user_id: "test_user_1", id: @comment.id), method: :delete do %>
+            <i class="fas fa-trash"></i>
+            <% end %>
+          </div>
+          <!--{% endif %}-->
+        </div>
+      </div>
+
+
+      <div class="my-1.5">
+        <% @comments.zip(@comments_likes).each do |comment, comment_likes| %>
+        <div class="bg-blue-100 rounded-lg mt-2.5 mb-2.5">
+          <div class="m-auto py-4">
+            <div class="break-all ml-auto mr-auto w-96">
+              <p><%= comment.content %></p>
+            </div>
+          </div>
+          <div class="flex m-auto w-96">
+            <span class="border-b border-black w-96 my-1.5"></span>
+          </div>
+          <div class="flex m-auto pb-1.5 w-96 break-all">
+            <div class="w-5/12">
+              <%= link_to comment.user_name, user_path(comment.user_id), class: "hover:text-gray-400" %>
+            </div>
+            <div class="flex w-3/12">
+              <!--Todo: 直下いいねmvcが出来次第form_withで書き換える。いいね数も-->
+              <form action="/comment/{{ child_data.PostIDs.post_id }}/push-like/{{ parent_post_id }}" method="POST">
+                <button type="submit"><i class="far fa-heart m-r-5"></i></button>
+              </form>
+              <a class="hover:text-gray-400"
+                href="/post/{{ child_data.PostIDs.post_id }}/likes"><%= comment_likes %></a>
+            </div>
+            <div class="w-2/12">
+              <%= link_to 'コメント', user_comment_path(user_id: comment.user_id, id: comment.id), class: "hover:text-gray-400"%>
+            </div>
+            <!--Todo: コメントのオーナーがcurrent_userと同じか判定する
+            {% if child_data.Comments.user_id == current_user_id %}-->
+            <div class="text-right w-2/12">
+              <%= link_to user_comment_path(user_id: comment.user_id, id: comment.id), method: :delete do %>
+              <i class="fas fa-trash"></i>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <%= render 'shared/comment_form' %>
+</div>
