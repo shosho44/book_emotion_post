@@ -19,12 +19,10 @@
             <%= link_to @passage.user_name, user_path(@passage.user_id) %>
           </div>
           <div class="flex w-3/12">
-            <!--Todo: 以下formをlink_toに書き直す。いいねのmvcを作り次第
-            <form action="/passage/{{ passage_id }}/push-like/{{ parent_post_id }}" method="POST">
-              <button type="submit"><i class="far fa-heart mr-1.5"></i></button>
-            </form>
-            <a class="hover:text-gray-400" href="/post/{{ parent_post_id }}/likes">{{ parent_like_sum }}</a>
-            -->
+            <%= link_to user_passage_bookmarks_check_path(user_id: "test_user_1", passage_id: @passage.id), method: :post do %>
+            <i class="far fa-bookmark mr-1.5"></i>
+            <% end %>
+            <%= link_to @passage_bookmarks, controller: "bookmarks", action: "show_passage_bookmarks", user_id: @passage.user_id, passage_id: @passage.id%>
           </div>
           <!-- Todo: passageのオーナーがcurrent_userかどうかの判定をつける
           % if parent_user_id == current_user_id %}-->

@@ -6,10 +6,10 @@ class PassagesController < ApplicationController
   end
 
   def show
-    @passage = User.joins(:passages).where(passages: { id: params[:id] }).select('users.name as user_name, passages.*').first
-    @passage_bookmarks = Passage.eager_load(:passage_bookmarks).where(passages: { id: 5 }).group('passages.id').count.map do |_key, value|
-      value
-    end
+    passage_id = params[:id].to_i
+
+    @passage = User.joins(:passages).where(passages: { id: passage_id }).select('users.name as user_name, passages.*').first
+    @passage_bookmarks = Passage.eager_load(:passage_bookmarks).where(passages: { id: passage_id }).group('passages.id').count('passage_bookmarks.id')[passage_id]
 
     @comment_form_model = Comment.new
     @comments = User.joins(passages: :comments).where(passages: { id: params[:id] })
