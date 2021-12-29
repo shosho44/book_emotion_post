@@ -10,76 +10,75 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_28_043721) do
+ActiveRecord::Schema.define(version: 2021_12_28_141730) do
 
-  create_table "comment_likes", force: :cascade do |t|
+  create_table "comment_likes", charset: "utf8mb3", force: :cascade do |t|
     t.string "user_id", null: false
-    t.integer "comment_id", null: false
+    t.bigint "comment_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["comment_id"], name: "index_comment_likes_on_comment_id"
     t.index ["user_id"], name: "index_comment_likes_on_user_id"
   end
 
-  create_table "comments", force: :cascade do |t|
+  create_table "comments", charset: "utf8mb3", force: :cascade do |t|
+    t.string "user_id", null: false
     t.text "content", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "user_id", null: false
-    t.index ["id"], name: "index_comments_on_id"
+    t.index ["id"], name: "index_comments_on_id", unique: true
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  create_table "comments_relations", force: :cascade do |t|
-    t.integer "parent_comment_id", null: false
-    t.integer "child_comment_id", null: false
+  create_table "comments_relations", charset: "utf8mb3", force: :cascade do |t|
+    t.bigint "parent_comment_id", null: false
+    t.bigint "child_comment_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["parent_comment_id"], name: "index_comments_relations_on_parent_comment_id"
   end
 
-  create_table "passage_bookmarks", force: :cascade do |t|
+  create_table "passage_bookmarks", charset: "utf8mb3", force: :cascade do |t|
     t.string "user_id", null: false
-    t.integer "passage_id", null: false
+    t.bigint "passage_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["passage_id"], name: "index_passage_bookmarks_on_passage_id"
     t.index ["user_id"], name: "index_passage_bookmarks_on_user_id"
   end
 
-  create_table "passages", force: :cascade do |t|
-    t.string "book_title", default: "不明", null: false
+  create_table "passages", charset: "utf8mb3", force: :cascade do |t|
+    t.string "user_id", null: false
+    t.string "book_title", default: "", null: false
     t.text "content", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "user_id", null: false
-    t.index ["id"], name: "index_passages_on_id"
+    t.index ["id"], name: "index_passages_on_id", unique: true
     t.index ["user_id"], name: "index_passages_on_user_id"
   end
 
-  create_table "passages_comment_relations", force: :cascade do |t|
+  create_table "passages_comment_relations", charset: "utf8mb3", force: :cascade do |t|
+    t.bigint "passage_id", null: false
+    t.bigint "comment_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "passage_id", null: false
-    t.integer "comment_id", null: false
     t.index ["comment_id"], name: "index_passages_comment_relations_on_comment_id"
     t.index ["passage_id"], name: "index_passages_comment_relations_on_passage_id"
   end
 
-  create_table "users", id: :string, force: :cascade do |t|
+  create_table "users", id: :string, charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.string "email", null: false
     t.string "self_introduction"
     t.string "password_digest", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["id"], name: "index_users_on_id"
+    t.index ["id"], name: "index_users_on_id", unique: true
   end
 
   add_foreign_key "comment_likes", "comments"
   add_foreign_key "comment_likes", "users"
   add_foreign_key "comments", "users"
-  add_foreign_key "comments_relations", "comments", column: "child_comment_id"
   add_foreign_key "comments_relations", "comments", column: "parent_comment_id"
   add_foreign_key "passage_bookmarks", "passages"
   add_foreign_key "passage_bookmarks", "users"

@@ -1,0 +1,10 @@
+<div class="flex">
+  <%= render 'shared/left_column' %>
+  <div class="w-2/5 ml-1.5 mr-1.5">
+    <% @users_pushed_comment_likes.each do |user_pushed_like| %>
+    <div>
+      <%= link_to user_pushed_like.name, user_path(user_pushed_like.user_id) %></a>
+    </div>
+    <% end %>
+  </div>
+</div>

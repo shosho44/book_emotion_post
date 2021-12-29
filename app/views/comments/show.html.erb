@@ -18,6 +18,11 @@
           <div class="flex w-3/12">
             <div class="flex w-3/12">
 
+              <%= link_to user_comment_likes_check_path(user_id: "test_user_1", comment_id: @comment.id), method: :post do %>
+              <i class="far fa-heart m-r-5"></i>
+              <% end %>
+              <%= link_to @comment_likes, controller: "likes", action: "show_comment_likes", user_id: @comment.user_id, comment_id: @comment.id %>
+
             </div>
             <!--Todo: 以下formをlink_toに書き直す。いいねのmvcを作り次第
             <form action="/passage/{{ passage_id }}/push-like/{{ parent_post_id }}" method="POST">

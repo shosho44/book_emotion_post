@@ -1,12 +1,12 @@
 class CommentsController < ApplicationController
   def show
+    comment_id = params[:id].to_i
+
     @comment_form_model = Comment.new
 
-    @comment = User.joins(:comments).where(comments: { id: params[:id] }).select('users.name as user_name, comments.*').first
+    @comment = User.joins(:comments).where(comments: { id: comment_id }).select('users.name as user_name, comments.*').first
 
-    @comment_like = Comment.eager_load(:comment_likes).where(comments: { id: params[:id] }).group('comments.id').count('comment_likes.id').map do |_key, value|
-      value
-    end
+    @comment_likes = Comment.eager_load(:comment_likes).where(comments: { id: comment_id }).group('comments.id').count('comment_likes.id')[comment_id]
 
     @comments = User.joins(:comments).eager_load(comments: :comments_relations).eager_load(comments: :comment_likes)
                     .where(comments_relations: { parent_comment_id: 1 })
