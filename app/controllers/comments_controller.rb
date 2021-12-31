@@ -17,8 +17,8 @@ class CommentsController < ApplicationController
                     .select('users.id as user_id, users.name as user_name, comments.content as content, comments.id as id')
                     .order('comments.created_at desc').order('comments.user_id asc')
 
-    @comments_likes = Comment.joins(:passages_comment_relation).eager_load(:comment_likes)
-                             .where(passages_comment_relations: { passage_id: comment_id }).group('comments.id').count('comment_likes.id')
+    @comments_likes = Comment.eager_load(:comment_likes)
+                             .where('comments.id in (?)', comment_ids).group('comments.id').count('comment_likes.id')
   end
 
   def create

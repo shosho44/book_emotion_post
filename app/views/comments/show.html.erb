@@ -34,7 +34,7 @@
 
 
       <div class="my-1.5">
-        <% @comments.zip(@comments_likes).each do |comment, comment_likes| %>
+        <% @comments.each do |comment| %>
         <div class="bg-blue-100 rounded-lg mt-2.5 mb-2.5">
           <div class="m-auto py-4">
             <div class="break-all ml-auto mr-auto w-96">
@@ -49,12 +49,10 @@
               <%= link_to comment.user_name, user_path(comment.user_id), class: "hover:text-gray-400" %>
             </div>
             <div class="flex w-3/12">
-              <!--Todo: 直下いいねmvcが出来次第form_withで書き換える。いいね数も-->
-              <form action="/comment/{{ child_data.PostIDs.post_id }}/push-like/{{ parent_post_id }}" method="POST">
-                <button type="submit"><i class="far fa-heart m-r-5"></i></button>
-              </form>
-              <a class="hover:text-gray-400"
-                href="/post/{{ child_data.PostIDs.post_id }}/likes"><%= comment_likes %></a>
+              <%= link_to user_comment_likes_check_path(user_id: "test_user_1", comment_id: comment.id), method: :post do %>
+              <i class="far fa-heart m-r-5"></i>
+              <% end %>
+              <%= link_to @comments_likes[comment.id.to_i], controller: "likes", action: "show_comment_likes", user_id: comment.user_id, comment_id: comment.id %>
             </div>
             <div class="w-2/12">
               <%= link_to 'コメント', user_comment_path(user_id: comment.user_id, id: comment.id), class: "hover:text-gray-400"%>
