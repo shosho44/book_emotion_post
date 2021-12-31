@@ -1,7 +1,7 @@
 class LikesController < ApplicationController
   def show_comment_likes
     @users_pushed_comment_like = User.eager_load(:comment_likes).where(comment_likes: { comment_id: params[:comment_id] })
-                                     .select('passage_bookmarks.user_id as user_id, users.name as name')
+                                     .select('comment_likes.user_id as user_id, users.name as name')
                                      .order('users.id asc')
   end
 
