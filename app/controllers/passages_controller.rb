@@ -12,11 +12,15 @@ class PassagesController < ApplicationController
     @passage_bookmarks = Passage.eager_load(:passage_bookmarks).where(passages: { id: passage_id }).group('passages.id').count('passage_bookmarks.id')[passage_id]
 
     @comment_form_model = Comment.new
-    @comments = User.joins(passages: :comments).where(passages: { id: params[:id] })
+    @comments = User.joins(passages: :comments).where(passages: { id: passage_id })
                     .select('users.id as user_id, users.name as user_name, comments.content as content, comments.id as id, passages.content as passge_content')
                     .order('comments.created_at desc').order('comments.user_id asc')
-    @comments_likes_plus_one = Passage.joins(:comments).includes(comments: :comment_likes).where(passages: { id: params[:id] }).order('comments.created_at desc').order('comments.user_id asc').group(:comment_id).count
-    @comments_likes = @comments_likes_plus_one.map { |_key, value| value - 1 }
+
+    @comments_likes = Passage.joins(:comments).eager_load(comments: :comment_likes).where(passages: { id: passage_id })
+                             .group('comments.id').count('comment_likes.id')
+
+    puts '##' * 30
+    puts @comments_likes
   end
 
   def show_all
