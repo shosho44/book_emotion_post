@@ -1,7 +1,11 @@
 class PassagesController < ApplicationController
   def create
     @passage = Passage.new(passage_params)
+
+    @passage.book_title = '不明' if @passage.book_title == ''
+
     @passage.save
+
     redirect_to root_url
   end
 
