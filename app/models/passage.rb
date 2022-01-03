@@ -1,8 +1,8 @@
 class Passage < ApplicationRecord
   belongs_to :user
-  has_many :passages_comment_relations
-  has_many :comments, through: :passages_comment_relations
-  has_many :passage_bookmarks
+  has_many :passages_comment_relations, dependent: :delete_all
+  has_many :comments, through: :passages_comment_relations, dependent: :delete_all
+  has_many :passage_bookmarks, dependent: :delete_all
 
   validates :content, presence: true, length: { maximum: 1023 }
 

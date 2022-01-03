@@ -18,9 +18,6 @@ class PassagesController < ApplicationController
 
     @comments_likes = Passage.joins(:comments).eager_load(comments: :comment_likes).where(passages: { id: passage_id })
                              .group('comments.id').count('comment_likes.id')
-
-    puts '##' * 30
-    puts @comments_likes
   end
 
   def show_all
@@ -35,7 +32,7 @@ class PassagesController < ApplicationController
 
   def destroy
     @passage = Passage.find(params[:id])
-    @passage.destroy
+    @passage.destroy!
     redirect_to root_url
   end
 
