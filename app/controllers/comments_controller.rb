@@ -19,6 +19,8 @@ class CommentsController < ApplicationController
 
     @comments_likes = Comment.eager_load(:comment_likes)
                              .where('comments.id in (?)', comment_ids).group('comments.id').count('comment_likes.id')
+
+    redirect_to root_url if @comment.nil?
   end
 
   def create
@@ -41,6 +43,8 @@ class CommentsController < ApplicationController
   end
 
   def destroy
+    puts '$' * 30
+    puts 'inner comment destroy'
     @comment = Comment.find(params[:id])
     @comment.destroy
     redirect_to request.referer
