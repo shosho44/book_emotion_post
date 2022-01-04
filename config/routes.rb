@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   root 'passages#show_all'
 
+  get 'login', to: 'cookies#new'
+  resource :cookies, { only: %i[create destroy] }
+
   resources :users, path_names: { new: 'signup' } do
     resource :bookmarks, { only: %i[show] }
 
