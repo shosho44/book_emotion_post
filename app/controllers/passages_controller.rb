@@ -1,20 +1,27 @@
 class PassagesController < ApplicationController
   def create
     @passage = Passage.new(passage_params)
+
+    @passage.book_title = '不明' if @passage.book_title == ''
+
     @passage.save
+
     redirect_to root_url
   end
 
   def show
-    @passage = User.joins(:passages).where(passages: { id: params[:id] }).select('users.name as user_name, passages.*').first
-    @passage_bookmarks = Passage.joins(:passage_bookmarks).where(passages: { id: params[:id] }).count
+    passage_id = params[:id].to_i
 
-    @comment = Comment.new
-    @comments = User.joins(passages: :comments).where(passages: { id: params[:id] })
+    @passage = User.joins(:passages).where(passages: { id: passage_id }).select('users.name as user_name, passages.*').first
+    @passage_bookmarks = Passage.eager_load(:passage_bookmarks).where(passages: { id: passage_id }).group('passages.id').count('passage_bookmarks.id')[passage_id]
+
+    @comment_form_model = Comment.new
+    @comments = User.joins(passages: :comments).where(passages: { id: passage_id })
                     .select('users.id as user_id, users.name as user_name, comments.content as content, comments.id as id, passages.content as passge_content')
                     .order('comments.created_at desc').order('comments.user_id asc')
-    @comments_likes_plus_one = Passage.joins(:comments).includes(comments: :comment_likes).where(passages: { id: params[:id] }).order('comments.created_at desc').order('comments.user_id asc').group(:comment_id).count
-    @comments_likes = @comments_likes_plus_one.map { |_key, value| value - 1 }
+
+    @comments_likes = Passage.joins(:comments).eager_load(comments: :comment_likes).where(passages: { id: passage_id })
+                             .group('comments.id').count('comment_likes.id')
   end
 
   def show_all
@@ -29,7 +36,7 @@ class PassagesController < ApplicationController
 
   def destroy
     @passage = Passage.find(params[:id])
-    @passage.destroy
+    @passage.destroy!
     redirect_to root_url
   end
 

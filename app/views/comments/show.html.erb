@@ -5,29 +5,26 @@
       <div class="bg-blue-100 rounded-lg mt-2.5 mb-2.5">
         <div class="m-auto py-4">
           <div class="break-all ml-auto mr-auto w-96">
-            <p><%= @passage.content %></p>
+            <p><%= @comment.content %></p>
           </div>
-        </div>
-        <div class="break-all m-auto w-96">
-          <span><i class="fas fa-book-open mr-1.5"></i><%= @passage.book_title %></span>
         </div>
         <div class="flex m-auto w-96">
           <span class="border-b border-black w-96 my-1.5"></span>
         </div>
         <div class="flex m-auto pb-1.5 w-96 break-all">
           <div class="w-5/12">
-            <%= link_to @passage.user_name, user_path(@passage.user_id) %>
+            <%= link_to @comment.user_name, user_path(@comment.user_id) %>
           </div>
           <div class="flex w-3/12">
-            <%= link_to user_passage_bookmarks_check_path(user_id: "test_user_1", passage_id: @passage.id), method: :post do %>
-            <i class="far fa-bookmark mr-1.5"></i>
+            <%= link_to user_comment_likes_check_path(user_id: "test_user_1", comment_id: @comment.id), method: :post do %>
+            <i class="far fa-heart m-r-5"></i>
             <% end %>
-            <%= link_to @passage_bookmarks, controller: "bookmarks", action: "show_passage_bookmarks", user_id: @passage.user_id, passage_id: @passage.id%>
+            <%= link_to @comment_likes, controller: "likes", action: "show_comment_likes", user_id: @comment.user_id, comment_id: @comment.id %>
           </div>
-          <!-- Todo: passageのオーナーがcurrent_userかどうかの判定をつける
+          <!-- Todo: commentのオーナーがcurrent_userかどうかの判定をつける
           % if parent_user_id == current_user_id %}-->
           <div class="text-right ml-auto w-2/12">
-            <%= link_to user_passage_path(user_id: "test_user_1", id: @passage.id), method: :delete do %>
+            <%= link_to user_comment_path(user_id: "test_user_1", id: @comment.id), method: :delete do %>
             <i class="fas fa-trash"></i>
             <% end %>
           </div>

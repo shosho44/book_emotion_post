@@ -1,7 +1,8 @@
 class User < ApplicationRecord
-  has_many :comments
-  has_many :passages
-  has_many :passage_bookmarks
+  has_many :comments, dependent: :delete_all
+  has_many :comment_likes, dependent: :delete_all
+  has_many :passages, dependent: :delete_all
+  has_many :passage_bookmarks, dependent: :delete_all
 
   before_save { email.downcase! }
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
