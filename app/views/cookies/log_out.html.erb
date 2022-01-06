@@ -1,0 +1,15 @@
+<div class="bg-gray-300 flex items-center justify-center h-screen w-screen">
+  <div class="bg-white rounded-lg h-72 w-72">
+    <div class="flex items-center justify-center h-4/6">
+      <h1 class="text-center">ログアウトしますか？</h1>
+    </div>
+    <div class="flex h-2/6 justify-around">
+      <div class="rounded-lg w-5/12">
+        <%= link_to "はい", cookies_path, method: :delete, class: "bg-gray-600 rounded-lg py-1.5 text-center w-full" %>
+      </div>
+      <div class="rounded-lg w-5/12">
+        <%= link_to "いいえ", request.referer, class: "bg-gray-300 rounded-lg py-1.5 text-center" %>
+      </div>
+    </div>
+  </div>
+</div>
