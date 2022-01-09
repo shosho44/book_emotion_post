@@ -1,10 +1,12 @@
 class UsersController < ApplicationController
+  include ApplicationHelper
+
   def new
     @user = User.new
   end
 
   def show
-    @user = User.find(params[:id])
+    @user = User.find_by(id: params[:id])
 
     @passages = User.joins(:passages).where(users: { id: params[:id] }).select('users.name as user_name, passages.*')
                     .order('passages.created_at desc').order('passages.user_id asc')
@@ -15,8 +17,10 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new(user_params)
-    if @user.save
+    user = User.new(user_params)
+    if user.save
+      user.remember
+      log_in(user)
       redirect_to root_url
     else
       render 'new'
@@ -24,7 +28,7 @@ class UsersController < ApplicationController
   end
 
   def update_name_self_introduction
-    @user = User.find(params[:id])
+    @user = User.find_by(id: params[:id])
     if @user.update(user_name_self_introduction_params)
       redirect_to @user
     else
@@ -33,7 +37,7 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = User.find(params[:id])
+    @user = User.find_by(id: params[:id])
   end
 
   def destroy

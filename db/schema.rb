@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_28_141730) do
+ActiveRecord::Schema.define(version: 2022_01_04_050612) do
 
   create_table "comment_likes", charset: "utf8mb3", force: :cascade do |t|
     t.string "user_id", null: false
@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(version: 2021_12_28_141730) do
     t.string "password_digest", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "remember_digest"
     t.index ["id"], name: "index_users_on_id", unique: true
   end
 

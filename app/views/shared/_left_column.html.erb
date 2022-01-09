@@ -4,10 +4,9 @@
   </div>
   <div class="m-auto mt-2.5 w-11/12">
     <!--Todo: user_pathに渡すidを入れる。current_userを定義出来たら-->
-    <%= link_to 'プロフィール', user_path("test_user_1"), class: "hover:text-gray-400" %>
+    <%= link_to 'プロフィール', user_path(current_user.id), class: "hover:text-gray-400" %>
   </div>
   <div class="m-auto mt-2.5 w-11/12">
-    <!-- Todo: ログアウトのurlを作ったら以下root_urlをログアウトのurlに変更する -->
-    <%= link_to 'ログアウト', root_url, class: "hover:text-gray-400" %>
+    <%= link_to 'ログアウト', logout_path, class: "hover:text-gray-400" %>
   </div>
 </div>

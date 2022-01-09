@@ -35,7 +35,7 @@ class PassagesController < ApplicationController
   end
 
   def destroy
-    @passage = Passage.find(params[:id])
+    @passage = Passage.find_by(id: params[:id])
     @passage.destroy!
     redirect_to root_url
   end
