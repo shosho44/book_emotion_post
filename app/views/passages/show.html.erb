@@ -19,7 +19,11 @@
             <%= link_to @passage.user_name, user_path(@passage.user_id) %>
           </div>
           <div class="flex w-3/12">
+            <% if logged_in? %>
             <%= link_to user_passage_bookmarks_check_path(user_id: current_user.id, passage_id: @passage.id), method: :post do %>
+            <i class="far fa-bookmark mr-1.5"></i>
+            <% end %>
+            <% else %>
             <i class="far fa-bookmark mr-1.5"></i>
             <% end %>
             <%= link_to @passage_bookmarks, controller: "bookmarks", action: "show_passage_bookmarks", user_id: @passage.user_id, passage_id: @passage.id%>
@@ -52,7 +56,11 @@
               <%= link_to comment.user_name, user_path(comment.user_id), class: "hover:text-gray-400" %>
             </div>
             <div class="flex w-3/12">
+              <% if logged_in? %>
               <%= link_to user_comment_likes_check_path(user_id: current_user.id, comment_id: comment.id), method: :post do %>
+              <i class="far fa-heart m-r-5"></i>
+              <% end %>
+              <% else %>
               <i class="far fa-heart m-r-5"></i>
               <% end %>
               <%= link_to @comments_likes[comment.id.to_i], controller: "likes", action: "show_comment_likes", user_id: comment.user_id, comment_id: comment.id %>
