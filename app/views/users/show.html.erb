@@ -10,10 +10,9 @@
                     </div>
                     <div class="ml-1.5 w-96 break-all">
                         <div class="text-right">
-                            <!--{% if is_current_user_equal_profile_user == True %}-->
-                            <!--Todo: 表示しているプロフィールがオーナーかどうかの判定をつける-->
+                            <% if @user.id == current_user.id %>
                             <%= link_to 'プロフィールを編集する', edit_user_url %>
-                            <!--{% endif %}-->
+                            <% end %>
                         </div>
                         <div>
                             <span class="text-3xl font-bold">
