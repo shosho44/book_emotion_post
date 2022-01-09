@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   root 'passages#show_all'
 
   get 'login', to: 'cookies#new'
-  get 'logout', to: 'cookies#log_out'
+  get 'logout', to: 'cookies#show_log_out'
   resource :cookies, { only: %i[create destroy] }
 
   resources :users, path_names: { new: 'signup' } do

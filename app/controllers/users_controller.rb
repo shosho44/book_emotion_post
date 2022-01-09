@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    @user = User.find(params[:id])
+    @user = User.find_by(id: params[:id])
 
     @passages = User.joins(:passages).where(users: { id: params[:id] }).select('users.name as user_name, passages.*')
                     .order('passages.created_at desc').order('passages.user_id asc')
@@ -18,12 +18,12 @@ class UsersController < ApplicationController
 
   def create
     user = User.new(user_params)
-    puts 'aaaaaaaaaaaaaaa'
-    if user.save!
-      puts 'bbbbbbbbbbb'
+    if user.save
       user.remember
       puts 'cccccccccccccccc'
       log_in(user)
+      puts current_user
+      puts @current_user.id
       puts 'eeeeeeeeeeeeeee'
       redirect_to root_url
       puts 'ooooooooooooooooooooo'
@@ -34,7 +34,7 @@ class UsersController < ApplicationController
   end
 
   def update_name_self_introduction
-    @user = User.find(params[:id])
+    @user = User.find_by(id: params[:id])
     if @user.update(user_name_self_introduction_params)
       redirect_to @user
     else
@@ -43,7 +43,7 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = User.find(params[:id])
+    @user = User.find_by(id: params[:id])
   end
 
   def destroy
