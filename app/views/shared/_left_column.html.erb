@@ -2,11 +2,19 @@
   <div class="m-auto mt-2.5 w-11/12">
     <%= link_to 'ホーム', root_url, class: "hover:text-gray-400" %>
   </div>
+  <% if logged_in? %>
   <div class="m-auto mt-2.5 w-11/12">
-    <!--Todo: user_pathに渡すidを入れる。current_userを定義出来たら-->
     <%= link_to 'プロフィール', user_path(current_user.id), class: "hover:text-gray-400" %>
   </div>
   <div class="m-auto mt-2.5 w-11/12">
     <%= link_to 'ログアウト', logout_path, class: "hover:text-gray-400" %>
   </div>
+  <% else %>
+  <div class="m-auto mt-2.5 w-11/12">
+    <%= link_to '新規登録', new_user_path, class: "hover:text-gray-400" %>
+  </div>
+  <div class="m-auto mt-2.5 w-11/12">
+    <%= link_to 'ログイン', login_path, class: "hover:text-gray-400" %>
+  </div>
+  <% end %>
 </div>
