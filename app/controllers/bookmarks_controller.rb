@@ -20,7 +20,6 @@ class BookmarksController < ApplicationController
   end
 
   def create(user_id, passage_id, request)
-    puts '#' * 100
     passage_bookmark = PassageBookmark.new(user_id: user_id, passage_id: passage_id)
     passage_bookmark.save
 

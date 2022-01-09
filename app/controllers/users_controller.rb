@@ -20,15 +20,9 @@ class UsersController < ApplicationController
     user = User.new(user_params)
     if user.save
       user.remember
-      puts 'cccccccccccccccc'
       log_in(user)
-      puts current_user
-      puts @current_user.id
-      puts 'eeeeeeeeeeeeeee'
       redirect_to root_url
-      puts 'ooooooooooooooooooooo'
     else
-      puts 'wwwwwwwwwwwwwwwwwwww'
       render 'new'
     end
   end

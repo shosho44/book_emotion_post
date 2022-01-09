@@ -43,8 +43,6 @@ class CommentsController < ApplicationController
   end
 
   def destroy
-    puts '$' * 30
-    puts 'inner comment destroy'
     @comment = Comment.find_by(id: params[:id])
     @comment.destroy
     redirect_to request.referer
