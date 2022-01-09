@@ -6,7 +6,7 @@ module ApplicationHelper
   end
 
   def logged_in?
-    !current_user.equal?('unauthenticated_user')
+    !current_user.id.eql?('unauthenticated_user')
   end
 
   def log_out(current_user)
