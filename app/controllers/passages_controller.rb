@@ -16,8 +16,8 @@ class PassagesController < ApplicationController
     @passage_bookmarks = Passage.eager_load(:passage_bookmarks).where(passages: { id: passage_id }).group('passages.id').count('passage_bookmarks.id')[passage_id]
 
     @comment_form_model = Comment.new
-    @comments = User.joins(passages: :comments).where(passages: { id: passage_id })
-                    .select('users.id as user_id, users.name as user_name, comments.content as content, comments.id as id, passages.content as passge_content')
+    @comments = User.joins(comments: :passages_comment_relation).where(passages_comment_relations: { passage_id: passage_id })
+                    .select('users.id as user_id, users.name as user_name, comments.content as content, comments.id as id')
                     .order('comments.created_at desc').order('comments.user_id asc')
 
     @comments_likes = Passage.joins(:comments).eager_load(comments: :comment_likes).where(passages: { id: passage_id })
