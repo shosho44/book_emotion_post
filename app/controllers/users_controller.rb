@@ -14,6 +14,9 @@ class UsersController < ApplicationController
     @passages_bookmarks = Passage.eager_load(:passage_bookmarks).where(passages: { user_id: params[:id] })
                                  .select('passages.id as passage_id').order('passages.created_at desc').order('passages.user_id asc')
                                  .group('passages.id').count('passage_bookmarks.id').map { |_key, value| value }
+
+                                 @has_user_logged_in = logged_in?
+    @current_user = current_user
   end
 
   def create

@@ -1,10 +1,14 @@
 class CommentsController < ApplicationController
+  include ApplicationHelper
+
   def show
     comment_id = params[:id].to_i
 
     @comment_form_model = Comment.new
 
     @comment = User.joins(:comments).where(comments: { id: comment_id }).select('users.name as user_name, comments.*').first
+
+    redirect_to root_url if @comment.nil?
 
     @comment_likes = Comment.eager_load(:comment_likes).where(comments: { id: comment_id }).group('comments.id').count('comment_likes.id')[comment_id]
 
@@ -20,7 +24,8 @@ class CommentsController < ApplicationController
     @comments_likes = Comment.eager_load(:comment_likes)
                              .where('comments.id in (?)', comment_ids).group('comments.id').count('comment_likes.id')
 
-    redirect_to root_url if @comment.nil?
+    @has_user_logged_in = logged_in?
+    @current_user = current_user
   end
 
   def create

@@ -19,8 +19,8 @@
             <%= link_to @passage.user_name, user_path(@passage.user_id) %>
           </div>
           <div class="flex w-3/12">
-            <% if logged_in? %>
-            <%= link_to user_passage_bookmarks_check_path(user_id: current_user.id, passage_id: @passage.id), method: :post do %>
+            <% if @has_user_logged_in %>
+            <%= link_to user_passage_bookmarks_check_path(user_id: @current_user.id, passage_id: @passage.id), method: :post do %>
             <i class="far fa-bookmark mr-1.5"></i>
             <% end %>
             <% else %>
@@ -28,9 +28,9 @@
             <% end %>
             <%= link_to @passage_bookmarks, controller: "bookmarks", action: "show_passage_bookmarks", user_id: @passage.user_id, passage_id: @passage.id%>
           </div>
-          <% if @passage.user_id == current_user.id %>
+          <% if @passage.user_id == @current_user.id %>
           <div class="text-right ml-auto w-2/12">
-            <%= link_to user_passage_path(user_id: current_user.id, id: @passage.id), method: :delete do %>
+            <%= link_to user_passage_path(user_id: @current_user.id, id: @passage.id), method: :delete do %>
             <i class="fas fa-trash"></i>
             <% end %>
           </div>
@@ -55,8 +55,8 @@
               <%= link_to comment.user_name, user_path(comment.user_id), class: "hover:text-gray-400" %>
             </div>
             <div class="flex w-3/12">
-              <% if logged_in? %>
-              <%= link_to user_comment_likes_check_path(user_id: current_user.id, comment_id: comment.id), method: :post do %>
+              <% if @has_user_logged_in %>
+              <%= link_to user_comment_likes_check_path(user_id: @current_user.id, comment_id: comment.id), method: :post do %>
               <i class="far fa-heart m-r-5"></i>
               <% end %>
               <% else %>
@@ -67,7 +67,7 @@
             <div class="w-2/12">
               <%= link_to 'コメント', user_comment_path(user_id: comment.user_id, id: comment.id), class: "hover:text-gray-400"%>
             </div>
-            <% if comment.user_id == current_user.id %>
+            <% if comment.user_id == @current_user.id %>
             <div class="text-right w-2/12">
               <%= link_to user_comment_path(user_id: comment.user_id, id: comment.id), method: :delete do %>
               <i class="fas fa-trash"></i>

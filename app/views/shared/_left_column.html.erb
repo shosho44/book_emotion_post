@@ -2,9 +2,9 @@
   <div class="m-auto mt-2.5 w-11/12">
     <%= link_to 'ホーム', root_url, class: "hover:text-gray-400" %>
   </div>
-  <% if logged_in? %>
+  <% if @has_user_logged_in %>
   <div class="m-auto mt-2.5 w-11/12">
-    <%= link_to 'プロフィール', user_path(current_user.id), class: "hover:text-gray-400" %>
+    <%= link_to 'プロフィール', user_path(@current_user.id), class: "hover:text-gray-400" %>
   </div>
   <div class="m-auto mt-2.5 w-11/12">
     <%= link_to 'ログアウト', logout_path, class: "hover:text-gray-400" %>
