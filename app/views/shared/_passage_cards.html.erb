@@ -16,8 +16,8 @@
       <%= link_to passage.user_name, user_path(passage.user_id), class: "hover:text-gray-50" %>
     </div>
     <div class="flex w-3/12">
-      <% if logged_in? %>
-      <%= link_to user_passage_bookmarks_check_path(user_id: current_user.id, passage_id: passage.id), method: :post do %>
+      <% if @has_user_logged_in %>
+      <%= link_to user_passage_bookmarks_check_path(user_id: @current_user.id, passage_id: passage.id), method: :post do %>
       <i class="far fa-bookmark mr-1.5"></i>
       <% end %>
       <% else %>
@@ -29,8 +29,8 @@
       <%= link_to 'コメント', user_passage_path(user_id: passage.user_id, id: passage.id), class: 'hover:text-gray-50' %>
     </div>
     <div class="text-right w-2/12">
-      <% if passage.user_id == current_user.id %>
-      <%= link_to user_passage_path(user_id: current_user.id, id: passage.id), method: :delete do %>
+      <% if passage.user_id == @current_user.id %>
+      <%= link_to user_passage_path(user_id: @current_user.id, id: passage.id), method: :delete do %>
       <i class="fas fa-trash"></i>
       <% end %>
       <% end %>
