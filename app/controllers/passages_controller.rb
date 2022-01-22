@@ -51,6 +51,6 @@ class PassagesController < ApplicationController
   private
 
   def passage_params
-    params.require(:passage).permit(:content, :book_title).merge(user_id: params[:user_id]) # TODO: current_userが出来たらcurrent_userのidを入れる
+    params.require(:passage).permit(:content, :book_title).merge(user_id: current_user.id)
   end
 end
